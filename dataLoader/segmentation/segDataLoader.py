@@ -6,6 +6,7 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
+from acdc import getACDC
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for segmentation.
@@ -38,10 +39,18 @@ class DataLoader(baseLoader.DataLoader):
         
         self.name = name
         self.path = path
+
         self.source = None
         self.source_idx = None
         self.source_name = None
         self.target = None
+
+        if self.name == "acdc":
+            rawData = getACDC()
+            self.source = rawData['source']
+            self.source_idx = rawData['source_idx']
+            self.source_name = rawData['source_name']
+            self.target = rawData['target']
 
     def get_data(self, format="df"):
         """
