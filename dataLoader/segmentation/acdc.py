@@ -5,31 +5,13 @@ warnings.filterwarnings("ignore")
 
 from . import segDataLoader
 
-class ACDC(segDataLoader.DataLoader):
+def getACDC():
     """
-    Data loader class to load ACDC datasets in segmentation task. 
-    More info: https://humanheart-project.creatis.insa-lyon.fr/database/#collection/637218c173e9f0047faa00fb/folder/637218e573e9f0047faa00fc
-
-    Args:
-        name (str): the dataset name.
-        path (str, optional):
-            The path to save the data file, defaults to './data'
-        print_stats (bool, optional):
-            Whether to print basic statistics of the dataset, defaults to False
+    fetch ACDC data, process and return in following format:
+        source (Pandas Series): a list of the segmentation sources
+        source_idx (Pandas Series): a list of the segmentation sources index
+        source_name (Pandas Series): a list of the segmentation sources names
+        target (Pandas Series): a list of the segmentation target
     """
-
-    def __init__(
-        self,
-        name,
-        path="./data",
-        print_stats=None,
-    ):
-        """Create a ACDC dataloader object."""
-        super().__init__(
-            name,
-            path,
-            print_stats,
-        )
-        if print_stats:
-            self.print_stats()
-        print("Done!", flush=True, file=sys.stderr)
+    # to do
+    pass
