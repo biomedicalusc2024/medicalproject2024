@@ -21,33 +21,56 @@ class DataLoader:
         """
         pass
 
-    def get_data(self, format="df"):
+    def get_data(self, format="df", dataset="train"):
         """
         Arguments:
             format (str, optional): the dataset format
+            dataset (str, optional): which dataset to return, defaults to "training"
 
         Returns:
-            pd.DataFrame/dict/np.array: when format is df/dict/DeepPurpose
+            pd.DataFrame/dict/list: when format is df/dict/DeepPurpose
 
         Raises:
             AttributeError: format not supported
         """
         if format == "df":
-            return pd.DataFrame({
-                self.source_name + "_ID": self.source_idx,
-                self.source_name: self.source,
-                "Target": self.target,
-            })
+            if dataset == "train":
+                return pd.DataFrame(self.trainset, columns=['source', 'target'])
+            elif dataset == "test":
+                return pd.DataFrame(self.testset, columns=['source', 'target'])
+            elif dataset == "all":
+                return pd.DataFrame(self.trainset+self.testset, columns=['source', 'target'])
+            else:
+                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
         elif format == "dict":
-            return {
-                self.source_name + "_ID": self.source_idx,
-                self.source_name: self.source,
-                "Target": self.target,
-            }
+            if dataset == "train":
+                return {
+                    "source": [item[0] for item in self.trainset],
+                    "target": [item[1] for item in self.trainset]
+                }
+            elif dataset == "test":
+                return {
+                    "source": [item[0] for item in self.testset],
+                    "target": [item[1] for item in self.testset]
+                }
+            elif dataset == "all":
+                return {
+                    "source": [item[0] for item in self.trainset+self.testset],
+                    "target": [item[1] for item in self.trainset+self.testset]
+                }
+            else:
+                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
         elif format == "DeepPurpose":
-            return self.source, self.target
+            if dataset == "train":
+                return self.trainset
+            elif dataset == "test":
+                return self.testset
+            elif dataset == "all":
+                return self.trainset+self.testset
+            else:
+                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
         else:
-            raise AttributeError("Please use the correct format input")
+            raise AttributeError("Please select the format input in ['df', 'dict', 'DeepPurpose']")
 
     def __len__(self):
         """
