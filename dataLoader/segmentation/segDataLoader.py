@@ -7,6 +7,8 @@ warnings.filterwarnings("ignore")
 
 from .. import baseLoader
 from .acdc import getACDC
+from .BraTS import getBraTS
+from .buid import getBUID
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for segmentation.
@@ -48,6 +50,18 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
             self.testset = rawData[1]
             self.trainset = rawData[2]
+        elif self.name == "brats":
+            rawData = getBraTS(self.path)
+            self.alldata = rawData[0]
+            self.testset = rawData[1]
+            self.trainset = rawData[2]
+        elif self.name == "buid":
+            rawData = getBUID(self.path)
+            self.alldata = rawData[0]
+            self.testset = rawData[1]
+            self.trainset = rawData[2]
+        else:
+            raise ValueError(f"Dataset {self.name} is not supported.")
 
         if print_stats:
             self.print_stats()
