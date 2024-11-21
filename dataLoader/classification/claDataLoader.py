@@ -42,6 +42,7 @@ class DataLoader(baseLoader.DataLoader):
         self.trainset = None
         self.testset = None
         self.valset = None
+        self.alldata = None
 
         if "medmnist" in self.name:
             sub = self.name.split("-")[-1]
@@ -79,30 +80,52 @@ class DataLoader(baseLoader.DataLoader):
         #         raise AttributeError("Please select the dataset input in ['train', 'test', 'val']")
         if format == "dict":
             if dataset == "train":
-                return {
-                    "source": self.trainset["source"],
-                    "target": self.trainset["target"]
-                }
+                if self.trainset is not None:
+                    return {
+                        "source": self.trainset["source"],
+                        "target": self.trainset["target"]
+                    }
+                else:
+                    raise AttributeError("trainset is not allowed in current dataset")
             elif dataset == "test":
-                return {
-                    "source": self.testset["source"],
-                    "target": self.testset["target"]
-                }
+                if self.testset is not None:
+                    return {
+                        "source": self.testset["source"],
+                        "target": self.testset["target"]
+                    }
+                else:
+                    raise AttributeError("testset is not allowed in current dataset")
             elif dataset == "val":
-                return {
-                    "source": self.valset["source"],
-                    "target": self.valset["target"]
-                }
+                if self.valset is not None:
+                    return {
+                        "source": self.valset["source"],
+                        "target": self.valset["target"]
+                    }
+                else:
+                    raise AttributeError("valset is not allowed in current dataset")
+            elif dataset == "all":
+                pass
             else:
-                raise AttributeError("Please select the dataset input in ['train', 'test', 'val']")
+                raise AttributeError("Please select the dataset input in ['train', 'test', 'val', 'all']")
         elif format == "DeepPurpose":
             if dataset == "train":
-                return self.trainset
+                if self.trainset is not None:
+                    return self.trainset
+                else:
+                    raise AttributeError("trainset is not allowed in current dataset")
             elif dataset == "test":
-                return self.testset
+                if self.testset is not None:
+                    return self.testset
+                else:
+                    raise AttributeError("testset is not allowed in current dataset")
             elif dataset == "val":
-                return self.valset
+                if self.valset is not None:
+                    return self.valset
+                else:
+                    raise AttributeError("valset is not allowed in current dataset")
+            elif dataset == "all":
+                pass
             else:
-                raise AttributeError("Please select the dataset input in ['train', 'test', 'val']")
+                raise AttributeError("Please select the dataset input in ['train', 'test', 'val', 'all']")
         else:
             raise AttributeError("Please select the format input in ['df', 'dict', 'DeepPurpose']")

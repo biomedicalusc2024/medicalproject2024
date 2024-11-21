@@ -24,6 +24,7 @@ class DataLoader(baseLoader.DataLoader):
     Attributes:
         trainset (list): a list of the segmentation trainset ([source_path, target_path])
         testset (list): a list of the segmentation testset ([source_path, target_path])
+        valtset (list): a list of the segmentation valtset ([source_path, target_path])
         alldata(dict): a dict for all data preserving folder structure
         name (str): dataset name
         path (str): path to save and retrieve the dataset
@@ -46,6 +47,7 @@ class DataLoader(baseLoader.DataLoader):
 
         self.trainset = None
         self.testset = None
+        self.valset = None
         self.alldata = None
 
         if self.name == "acdc":
@@ -96,39 +98,86 @@ class DataLoader(baseLoader.DataLoader):
 
         if format == "df":
             if dataset == "train":
-                return pd.DataFrame(self.trainset, columns=['source', 'target'])
+                if self.trainset is not None:
+                    return pd.DataFrame(self.trainset, columns=['source', 'target'])
+                else:
+                    raise AttributeError("trainset is not allowed in current dataset")
             elif dataset == "test":
-                return pd.DataFrame(self.testset, columns=['source', 'target'])
+                if self.testset is not None:
+                    return pd.DataFrame(self.testset, columns=['source', 'target'])
+                else:
+                    raise AttributeError("testset is not allowed in current dataset")
+            elif dataset == "val":
+                if self.valset is not None:
+                    return pd.DataFrame(self.valset, columns=['source', 'target'])
+                else:
+                    raise AttributeError("valset is not allowed in current dataset")
             elif dataset == "all":
-                return pd.DataFrame(self.trainset+self.testset, columns=['source', 'target'])
+                if self.alldata is not None:
+                    return pd.DataFrame(self.alldata, columns=['source', 'target'])
+                else:
+                    all_data = []
+                    for subset in [self.trainset, self.testset, self.valset]:
+                        if subset is not None:
+                            all_data = all_data + subset
+                    return pd.DataFrame(all_data, columns=['source', 'target'])
             else:
-                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
+                raise AttributeError("Please select the dataset input in ['train', 'test', 'val', 'all']")
         elif format == "dict":
             if dataset == "train":
-                return {
-                    "source": [item[0] for item in self.trainset],
-                    "target": [item[1] for item in self.trainset]
-                }
+                if self.trainset is not None:
+                    return {
+                        "source": [item[0] for item in self.trainset],
+                        "target": [item[1] for item in self.trainset]
+                    }
+                else:
+                    raise AttributeError("trainset is not allowed in current dataset")
             elif dataset == "test":
-                return {
-                    "source": [item[0] for item in self.testset],
-                    "target": [item[1] for item in self.testset]
-                }
+                if self.testset is not None:
+                    return {
+                        "source": [item[0] for item in self.testset],
+                        "target": [item[1] for item in self.testset]
+                    }
+                else:
+                    raise AttributeError("testset is not allowed in current dataset")
             elif dataset == "all":
-                return {
-                    "source": [item[0] for item in self.trainset+self.testset],
-                    "target": [item[1] for item in self.trainset+self.testset]
-                }
+                if self.alldata is not None:
+                    return {
+                        "source": [item[0] for item in self.alldata],
+                        "target": [item[1] for item in self.alldata]
+                    }
+                else:
+                    all_data = []
+                    for subset in [self.trainset, self.testset, self.valset]:
+                        if subset is not None:
+                            all_data = all_data + subset
+                    return {
+                        "source": [item[0] for item in all_data],
+                        "target": [item[1] for item in all_data]
+                    }
             else:
-                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
+                raise AttributeError("Please select the dataset input in ['train', 'test', 'val', 'all']")
         elif format == "DeepPurpose":
             if dataset == "train":
-                return self.trainset
+                if self.trainset is not None:
+                    return self.trainset
+                else:
+                    raise AttributeError("trainset is not allowed in current dataset")
             elif dataset == "test":
-                return self.testset
+                if self.testset is not None:
+                    return self.testset
+                else:
+                    raise AttributeError("testset is not allowed in current dataset")
             elif dataset == "all":
-                return self.trainset+self.testset
+                if self.alldata is not None:
+                    return self.alldata
+                else:
+                    all_data = []
+                    for subset in [self.trainset, self.testset, self.valset]:
+                        if subset is not None:
+                            all_data = all_data + subset
+                    return all_data
             else:
-                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
+                raise AttributeError("Please select the dataset input in ['train', 'test', 'val', 'all']")
         else:
             raise AttributeError("Please select the format input in ['df', 'dict', 'DeepPurpose']")
