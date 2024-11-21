@@ -1,4 +1,4 @@
-from dataLoader.segmentation import DataLoader
+from dataLoader.classification import DataLoader
 
-dataloader = DataLoader(name="acdc")
+dataloader = DataLoader(name="medmnist-bloodmnist_64")
 breakpoint()

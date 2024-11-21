@@ -18,7 +18,6 @@ def getACDC(path):
         source_name (Pandas Series): a list of the segmentation sources names
         target (Pandas Series): a list of the segmentation target
     """
-    # to do
     url = "https://humanheart-project.creatis.insa-lyon.fr/database/api/v1/folder/637218e573e9f0047faa00fc/download"
     rawdata, dataset = datasetLoad(url=url, path=path, datasetName="ACDC")
     return rawdata, dataset['training'], dataset['testing']
