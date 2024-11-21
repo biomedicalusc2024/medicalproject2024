@@ -9,7 +9,10 @@ from .. import baseLoader
 from .acdc import getACDC
 from .BraTS import getBraTS
 from .buid import getBUID
-
+from .cir import getCIR  
+from .kvasir import getKvasir
+from .pancreas import getPancreas
+from .la import getLA
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for segmentation.
 
@@ -35,7 +38,7 @@ class DataLoader(baseLoader.DataLoader):
         """
         Create a base dataloader object that each segmentation task dataloader class can inherit from.
         Raises:
-            VauleError:
+            ValueError:
         """
         
         self.name = name
@@ -60,6 +63,18 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
             self.testset = rawData[1]
             self.trainset = rawData[2]
+        elif self.name == "cir": 
+            rawData = getCIR(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "kvasir": 
+            rawData = getKvasir(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "pancreas": 
+            rawData = getPancreas(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "la": 
+            rawData = getLA(self.path)
+            self.alldata = rawData[0]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
 
