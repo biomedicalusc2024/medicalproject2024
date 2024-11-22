@@ -1,9 +1,9 @@
 import os
 import zipfile
+import subprocess
 import warnings
 from tqdm import tqdm
 from collections import defaultdict
-import kagglehub
 
 warnings.filterwarnings("ignore")
 
@@ -19,9 +19,12 @@ def getBUID(path):
     """
     kaggle_url = "aryashah2k/breast-ultrasound-images-dataset"
     rawdata, dataset = datasetLoad(url=kaggle_url, path=path, datasetName="BUID")
-    if rawdata is None or dataset is None:
+
+    # Ensure dataset contains all necessary categories
+    if not dataset or not all(dataset.get(cat) for cat in ["benign", "malignant", "normal"]):
         raise ValueError("Failed to fetch or process the Breast Ultrasound Images Dataset.")
-    return dataset['benign'], dataset['malignant'], dataset['normal']
+
+    return dataset["benign"], dataset["malignant"], dataset["normal"]
 
 
 def datasetLoad(url, path, datasetName):
@@ -38,8 +41,9 @@ def datasetLoad(url, path, datasetName):
             print_sys("Downloading Breast Ultrasound Images Dataset...")
             os.makedirs(datasetPath, exist_ok=True)
 
-            # Download the dataset using KaggleHub
-            kagglehub.dataset_download(url, datasetPath)
+            # Use Kaggle CLI to download the dataset
+            kaggle_command = f"kaggle datasets download -d {url} -p {datasetPath}"
+            subprocess.run(kaggle_command, shell=True, check=True)
 
             # Identify the ZIP file in the datasetPath
             zip_files = [f for f in os.listdir(datasetPath) if f.endswith(".zip")]
@@ -55,6 +59,9 @@ def datasetLoad(url, path, datasetName):
 
             return loadLocalFiles(datasetPath)
 
+    except subprocess.CalledProcessError as e:
+        print_sys(f"Error during Kaggle CLI execution: {e}")
+        return None, None
     except Exception as e:
         print_sys(f"Error: {e}")
         return None, None
@@ -64,22 +71,28 @@ def loadLocalFiles(path):
     """
     Process the local files into a structured format based on the folder categories.
     """
-    all_paths = defaultdict(dict)
     dataset = defaultdict(list)
 
+    # Navigate to the nested folder
+    nested_dir = os.path.join(path, "Dataset_BUSI_with_GT")
+    if not os.path.isdir(nested_dir):
+        raise ValueError(f"Expected folder 'Dataset_BUSI_with_GT' not found in {path}")
+
     # Iterate over the main categories (benign, malignant, normal)
-    for category in os.listdir(path):
-        category_path = os.path.join(path, category)
-        if os.path.isdir(category_path):
+    for category in ["benign", "malignant", "normal"]:
+        category_path = os.path.join(nested_dir, category)
+        if os.path.isdir(category_path):  # Check if the category folder exists
             for file_name in os.listdir(category_path):
                 file_path = os.path.join(category_path, file_name)
                 if file_name.endswith((".png", ".jpg", ".jpeg")):  # Assuming images are in these formats
-                    # In this case, no masks are present, so only the source path is added
+                    # Add file path to the respective category
                     dataset[category].append(file_path)
+        else:
+            print_sys(f"Warning: No directory found for category '{category}'.")
 
-    # Flatten dataset structure for train/test compatibility
-    all_paths = {
-        "all": {i: dataset[category] for i, category in enumerate(dataset.keys())}
-    }
+    # Debugging outputs
+    print_sys(f"Categories found: {list(dataset.keys())}")
+    for key, files in dataset.items():
+        print_sys(f"Category '{key}': {len(files)} files")
 
-    return all_paths, dataset
+    return None, dataset
