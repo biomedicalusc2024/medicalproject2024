@@ -9,6 +9,7 @@ from .. import baseLoader
 from .acdc import getACDC
 from .BraTS import getBraTS
 from .buid import getBUID
+from .cir import getCIR  # Import the CIR dataset function
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for segmentation.
@@ -35,7 +36,7 @@ class DataLoader(baseLoader.DataLoader):
         """
         Create a base dataloader object that each segmentation task dataloader class can inherit from.
         Raises:
-            VauleError:
+            ValueError:
         """
         
         self.name = name
@@ -60,6 +61,9 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
             self.testset = rawData[1]
             self.trainset = rawData[2]
+        elif self.name == "cir": 
+            rawData = getCIR(self.path)
+            self.alldata = rawData[0]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
 
