@@ -12,6 +12,7 @@ from .buid import getBUID
 from .cir import getCIR  
 from .kvasir import getKvasir
 from .pancreas import getPancreas
+from .la import getLA
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for segmentation.
 
@@ -70,6 +71,9 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
         elif self.name == "pancreas": 
             rawData = getPancreas(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "la": 
+            rawData = getLA(self.path)
             self.alldata = rawData[0]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
