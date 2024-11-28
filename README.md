@@ -1,1 +1,1 @@
-# medicalproject2024
+# Medical Project
