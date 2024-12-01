@@ -14,6 +14,7 @@ from .kvasir import getKvasir
 from .pancreas import getPancreas
 from .la import getLA
 from .lits import getLiTS
+from .hippo import getHippo
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for segmentation.
 
@@ -80,6 +81,9 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
         elif self.name == "lits": 
             rawData = getLiTS(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "hippo": 
+            rawData = getHippo(self.path)
             self.alldata = rawData[0]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
