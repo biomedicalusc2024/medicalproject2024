@@ -12,7 +12,7 @@ from ..utils import print_sys
 
 def getChestXray(path):
     """
-    Fetch Pancreas CT Dataset, process, and return in the following format:
+    Fetch chest X-rays, process, and return in the following format:
         rawdata (list): A list of all extracted file paths.
     """
     kaggle_url = "nikhilpandey360/chest-xray-masks-and-labels"
