@@ -84,7 +84,7 @@ def loadLocalFiles(path):
         if os.path.isdir(category_path):  # Check if the category folder exists
             for file_name in os.listdir(category_path):
                 file_path = os.path.join(category_path, file_name)
-                if file_name.endswith((".png", ".jpg", ".jpeg")):  # Assuming images are in these formats
+                if file_name.endswith((".png", ".jpg", ".jpeg")): 
                     # Add file path to the respective category
                     dataset[category].append(file_path)
         else:

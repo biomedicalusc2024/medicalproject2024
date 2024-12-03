@@ -15,7 +15,7 @@ def getLA(path):
     Fetch LA data, process, and return in the following format:
         rawdata (list): A list of all extracted file paths.
     """
-    url = "https://ucc27133c5fe1689324a65c3a974.dl-au.dropboxusercontent.com/cd/0/get/CfL9DAx0HMdgdvx5dv-CiYKSjCGEYxqL5Fo_RTF4QJTPF6r9Qjem-LDbyp5MY4D72LcfjOca-5QECsRSm2Ujy-wpHRhWE44ErScoFgI47IlEztS8Snihm1tL6nmtjtRMvl_uzO9YfgPUYm07r3LkqBR250B7fD_jtV6YDKElgdrjyw/file?_download_id=485465245481997439970136929159236780617455625347326127184307358&_log_download_success=1&_notify_domain=www.dropbox.com&dl=1"  # Replace with the actual URL
+    url = "https://ucc27133c5fe1689324a65c3a974.dl-au.dropboxusercontent.com/cd/0/get/CfL9DAx0HMdgdvx5dv-CiYKSjCGEYxqL5Fo_RTF4QJTPF6r9Qjem-LDbyp5MY4D72LcfjOca-5QECsRSm2Ujy-wpHRhWE44ErScoFgI47IlEztS8Snihm1tL6nmtjtRMvl_uzO9YfgPUYm07r3LkqBR250B7fD_jtV6YDKElgdrjyw/file?_download_id=485465245481997439970136929159236780617455625347326127184307358&_log_download_success=1&_notify_domain=www.dropbox.com&dl=1"  
 
     return datasetLoad(url=url, path=path, datasetName="LA")
 

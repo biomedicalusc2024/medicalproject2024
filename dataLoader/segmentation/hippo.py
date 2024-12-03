@@ -50,7 +50,6 @@ def datasetLoad(url, path, datasetName):
                     f.write(chunk)
                     pbar.update(len(chunk))
 
-    # Extract the file if it hasn't been extracted yet
     extracted_dir = os.path.join(datasetPath, "extracted")
     if not os.path.exists(extracted_dir):
         print(f"Extracting {file_name}...")
