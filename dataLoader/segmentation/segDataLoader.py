@@ -16,6 +16,7 @@ from .la import getLA
 from .lits import getLiTS
 from .hippo import getHippo
 from .chestXray import getChestXray
+from .msd import getMSD
 from .BKAI_IGH_NeoPolyp import getBKAI_IGH
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for segmentation.
@@ -92,6 +93,9 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
         elif self.name == "bkaiigh": 
             rawData = getBKAI_IGH(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "msd": 
+            rawData = getMSD(self.path)
             self.alldata = rawData[0]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
