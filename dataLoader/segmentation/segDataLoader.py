@@ -19,6 +19,7 @@ from .chestXray import getChestXray
 from .msd import getMSD
 from .nlst import getNLST
 from .octa500 import getOCTA
+from .covid_qu_ex import getCovid_QU_EX
 from .chexmask import getCheXmask
 from .siim_acr_pneumothorax import getSIIM_ACR
 from .cbis_ddsm import getCBIS_DDSM
@@ -107,6 +108,9 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
         elif self.name == "octa": 
             rawData = getOCTA(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "covidqu": 
+            rawData = getCovid_QU_EX(self.path)
             self.alldata = rawData[0]
         elif self.name == "chexmask": 
             rawData = getCheXmask(self.path)
