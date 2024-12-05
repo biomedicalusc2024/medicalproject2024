@@ -7,7 +7,7 @@ warnings.filterwarnings("ignore")
 
 from .. import baseLoader
 from .acdc import getACDC
-from .BraTS import getBraTS
+from .brats import getBraTS
 from .buid import getBUID
 from .cir import getCIR  
 from .kvasir import getKvasir
@@ -17,9 +17,9 @@ from .lits import getLiTS
 from .hippo import getHippo
 from .chestXray import getChestXray
 from .msd import getMSD
-from .SIIM_ACR_Pneumothorax import getSIIM_ACR
-from .CBIS_DDSM import getCBIS_DDSM
-from .BKAI_IGH_NeoPolyp import getBKAI_IGH
+from .siim_acr_pneumothorax import getSIIM_ACR
+from .cbis_ddsm import getCBIS_DDSM
+from .bkai_igh_neopolyp import getBKAI_IGH
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for segmentation.
 
