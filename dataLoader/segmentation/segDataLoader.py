@@ -17,6 +17,7 @@ from .lits import getLiTS
 from .hippo import getHippo
 from .chestXray import getChestXray
 from .msd import getMSD
+from .nlst import getNLST
 from .siim_acr_pneumothorax import getSIIM_ACR
 from .cbis_ddsm import getCBIS_DDSM
 from .bkai_igh_neopolyp import getBKAI_IGH
@@ -98,6 +99,9 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
         elif self.name == "msd": 
             rawData = getMSD(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "nlst": 
+            rawData = getNLST(self.path)
             self.alldata = rawData[0]
         elif self.name == "siimacr": 
             rawData = getSIIM_ACR(self.path)
