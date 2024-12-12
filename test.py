@@ -1,4 +1,4 @@
 from dataLoader.classification import DataLoader
 
-dataloader = DataLoader(name="medmnist-bloodmnist_64")
+dataloader = DataLoader(name="rond")
 breakpoint()
