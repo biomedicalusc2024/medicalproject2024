@@ -12,6 +12,8 @@ from .buid import getBUID
 from .cir import getCIR  
 from .kvasir import getKvasir
 from .pancreas import getPancreas
+from .isic_2018 import getISIC_2018
+from .isic_2019 import getISIC_2019
 from .la import getLA
 from .lits import getLiTS
 from .hippo import getHippo
@@ -84,6 +86,12 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = rawData[0]
         elif self.name == "pancreas": 
             rawData = getPancreas(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "isic2018": 
+            rawData = getISIC_2018(self.path)
+            self.alldata = rawData[0]
+        elif self.name == "isic2019": 
+            rawData = getISIC_2019(self.path)
             self.alldata = rawData[0]
         elif self.name == "la": 
             rawData = getLA(self.path)

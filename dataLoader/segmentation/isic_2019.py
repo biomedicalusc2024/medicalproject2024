@@ -1,0 +1,78 @@
+import os
+import requests
+import zipfile
+import warnings
+from tqdm import tqdm
+
+warnings.filterwarnings("ignore")
+
+def getISIC_2019(path):
+    """
+    Fetch ISIC-2019 data from multiple URLs, process, and return in the following format:
+        rawdata (list): A list of all extracted file paths.
+    """
+    urls = {
+        "ISIC2019_Part1": "https://isic-challenge-data.s3.amazonaws.com/2019/ISIC_2019_Training_Input.zip",
+        "ISIC2019_Part2": "https://isic-challenge-data.s3.amazonaws.com/2019/ISIC_2019_Training_Metadata.csv",
+    }
+
+    return datasetLoad(urls=urls, path=path, datasetName="ISIC-2019")
+
+
+def datasetLoad(urls, path, datasetName):
+    """
+    Download and extract the ISIC dataset from multiple URLs.
+
+    Args:
+        urls (dict): Dictionary containing dataset names and their URLs.
+        path (str): Base directory to store the downloaded files.
+        datasetName (str): Name of the dataset.
+
+    Returns:
+        rawdata (list): List of all extracted file paths.
+    """
+    datasetPath = os.path.join(path, datasetName)
+    rawdata = []
+
+    os.makedirs(datasetPath, exist_ok=True)
+
+    for name, url in urls.items():
+        file_name = f"{name}.zip"
+        file_path = os.path.join(datasetPath, file_name)
+
+        # Download the file if not already present
+        if not os.path.exists(file_path):
+            print(f"Starting download: {file_name}")
+            response = requests.get(url, stream=True)
+            if response.status_code == 200:
+                total_size = int(response.headers.get("content-length", 0))
+                with open(file_path, "wb") as f, tqdm(
+                    total=total_size, unit="iB", unit_scale=True, desc=f"Downloading {file_name}"
+                ) as pbar:
+                    for chunk in response.iter_content(chunk_size=8192):
+                        if chunk:
+                            f.write(chunk)
+                            pbar.update(len(chunk))
+                print(f"Download complete: {file_name}")
+            else:
+                print(f"Failed to download {file_name}. HTTP Status Code: {response.status_code}")
+                continue
+
+        # Extract the file if it hasn't been extracted yet
+        extracted_dir = os.path.join(datasetPath, name)
+        if not os.path.exists(extracted_dir):
+            print(f"Starting extraction: {file_name}")
+            try:
+                with zipfile.ZipFile(file_path, "r") as zip_ref:
+                    zip_ref.extractall(path=extracted_dir)
+                print(f"Extraction complete: {file_name}")
+            except zipfile.BadZipFile as e:
+                print(f"Failed to extract {file_name}. Error: {e}")
+                continue
+
+        for root, _, files in os.walk(extracted_dir):
+            for file in files:
+                rawdata.append(os.path.join(root, file))
+
+    print(f"Total files collected: {len(rawdata)}")
+    return rawdata
