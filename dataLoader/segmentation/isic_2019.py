@@ -21,7 +21,7 @@ def getISIC_2019(path):
 
 def datasetLoad(urls, path, datasetName):
     """
-    Download and extract the ISIC dataset from multiple URLs.
+    Download and extract or save the ISIC dataset from multiple URLs.
 
     Args:
         urls (dict): Dictionary containing dataset names and their URLs.
@@ -29,7 +29,7 @@ def datasetLoad(urls, path, datasetName):
         datasetName (str): Name of the dataset.
 
     Returns:
-        rawdata (list): List of all extracted file paths.
+        rawdata (list): List of all processed file paths.
     """
     datasetPath = os.path.join(path, datasetName)
     rawdata = []
@@ -37,7 +37,8 @@ def datasetLoad(urls, path, datasetName):
     os.makedirs(datasetPath, exist_ok=True)
 
     for name, url in urls.items():
-        file_name = f"{name}.zip"
+        file_extension = "zip" if url.endswith(".zip") else "csv"
+        file_name = f"{name}.{file_extension}"
         file_path = os.path.join(datasetPath, file_name)
 
         # Download the file if not already present
@@ -58,21 +59,27 @@ def datasetLoad(urls, path, datasetName):
                 print(f"Failed to download {file_name}. HTTP Status Code: {response.status_code}")
                 continue
 
-        # Extract the file if it hasn't been extracted yet
-        extracted_dir = os.path.join(datasetPath, name)
-        if not os.path.exists(extracted_dir):
-            print(f"Starting extraction: {file_name}")
-            try:
-                with zipfile.ZipFile(file_path, "r") as zip_ref:
-                    zip_ref.extractall(path=extracted_dir)
-                print(f"Extraction complete: {file_name}")
-            except zipfile.BadZipFile as e:
-                print(f"Failed to extract {file_name}. Error: {e}")
-                continue
+        # Handle .zip files by extracting
+        if file_extension == "zip":
+            extracted_dir = os.path.join(datasetPath, name)
+            if not os.path.exists(extracted_dir):
+                print(f"Starting extraction: {file_name}")
+                try:
+                    with zipfile.ZipFile(file_path, "r") as zip_ref:
+                        zip_ref.extractall(path=extracted_dir)
+                    print(f"Extraction complete: {file_name}")
+                except zipfile.BadZipFile as e:
+                    print(f"Failed to extract {file_name}. Error: {e}")
+                    continue
 
-        for root, _, files in os.walk(extracted_dir):
-            for file in files:
-                rawdata.append(os.path.join(root, file))
+            for root, _, files in os.walk(extracted_dir):
+                for file in files:
+                    rawdata.append(os.path.join(root, file))
+
+        # Handle .csv files by adding them directly
+        elif file_extension == "csv":
+            print(f"Processing CSV file: {file_name}")
+            rawdata.append(file_path)
 
     print(f"Total files collected: {len(rawdata)}")
     return rawdata
