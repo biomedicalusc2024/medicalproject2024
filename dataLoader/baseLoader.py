@@ -18,59 +18,37 @@ class DataLoader:
     def __init__(self):
         """
         empty data loader class, to be overwritten
+        basic attributes: (alldata can be none when any of train, test, val is not)
+            trainset (list): a dict of the NER trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+            testset (list): a dict of the NER testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+            valset (list): a dict of the NER valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+            alldata(dict): a dict of the whole NER dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+            name (str): dataset name
+            path (str): path to save and retrieve the dataset
+            support_format (list<str>): format valid for current dataset
+            support_subset (list<str>): subset valid for current dataset
         """
-        pass
+        self.trainset = None
+        self.testset = None
+        self.valset = None
+        self.alldata = None
+        self.support_format = []
+        self.support_subset = []
 
-    def get_data(self, format="df", dataset="train"):
+    def get_data(self, format="dict", dataset="all"):
         """
         Arguments:
             format (str, optional): the dataset format
-            dataset (str, optional): which dataset to return, defaults to "training"
+            dataset (str, optional): which dataset to return, defaults to "all"
 
         Returns:
-            pd.DataFrame/dict/list: when format is df/dict/DeepPurpose
+            dict/pd.DataFrame/list: when format is dict/df/DeepPurpose
 
         Raises:
             AttributeError: format not supported
+            AttributeError: dataset not supported
         """
-        if format == "df":
-            if dataset == "train":
-                return pd.DataFrame(self.trainset, columns=['source', 'target'])
-            elif dataset == "test":
-                return pd.DataFrame(self.testset, columns=['source', 'target'])
-            elif dataset == "all":
-                return pd.DataFrame(self.trainset+self.testset, columns=['source', 'target'])
-            else:
-                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
-        elif format == "dict":
-            if dataset == "train":
-                return {
-                    "source": [item[0] for item in self.trainset],
-                    "target": [item[1] for item in self.trainset]
-                }
-            elif dataset == "test":
-                return {
-                    "source": [item[0] for item in self.testset],
-                    "target": [item[1] for item in self.testset]
-                }
-            elif dataset == "all":
-                return {
-                    "source": [item[0] for item in self.trainset+self.testset],
-                    "target": [item[1] for item in self.trainset+self.testset]
-                }
-            else:
-                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
-        elif format == "DeepPurpose":
-            if dataset == "train":
-                return self.trainset
-            elif dataset == "test":
-                return self.testset
-            elif dataset == "all":
-                return self.trainset+self.testset
-            else:
-                raise AttributeError("Please select the dataset input in ['train', 'test', 'all']")
-        else:
-            raise AttributeError("Please select the format input in ['df', 'dict', 'DeepPurpose']")
+        pass
 
     def __len__(self):
         """
@@ -79,7 +57,7 @@ class DataLoader:
         Returns:
             int: number of data points
         """
-        return len(self.get_data(format="df"))
+        return len(self.get_data(format="DeepPurpose", dataset="all"))
     
     def print_stats(self):
         """

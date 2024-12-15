@@ -1,4 +1,4 @@
-from dataLoader.detection import DataLoader
+from dataLoader.namedentityrocognition import DataLoader
 
-dataloader = DataLoader(name="chestxrays")
+dataloader = DataLoader(name="rond")
 breakpoint()

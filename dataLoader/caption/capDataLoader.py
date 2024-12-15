@@ -6,10 +6,9 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
-from .chestxrays import getChestXRays
 
 class DataLoader(baseLoader.DataLoader):
-    """A base data loader class for detection.
+    """A base data loader class for classification.
 
     Args:
         name (str): the dataset name.
@@ -17,10 +16,10 @@ class DataLoader(baseLoader.DataLoader):
         print_stats (bool): Whether to print basic statistics of the dataset
 
     Attributes:
-        trainset (list): a dict of the detection trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        testset (list): a dict of the detection testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        valset (list): a dict of the detection valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        alldata(dict): a dict of the whole detection dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+        trainset (list): a dict of the classification trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+        testset (list): a dict of the classification testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+        valset (list): a dict of the classification valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+        alldata(dict): a dict of the whole classification dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
         name (str): dataset name
         path (str): path to save and retrieve the dataset
         support_format (list<str>): format valid for current dataset
@@ -34,7 +33,9 @@ class DataLoader(baseLoader.DataLoader):
         print_stats=False,
     ):
         """
-        Create a base dataloader object that each detection task dataloader class can inherit from.
+        Create a base dataloader object that each segmentation task dataloader class can inherit from.
+        Raises:
+            VauleError:
         """
         
         self.name = name
@@ -47,8 +48,16 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if "chestxrays" in self.name:
-            datasets = getChestXRays(self.path)
+        if "medmnist" in self.name:
+            sub = self.name.split("-")[-1]
+            datasets = getMedMnist(self.path, sub)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.valset = datasets[2]
+            self.support_format = ["dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "val", "all"]
+        elif self.name == "rond":
+            datasets = getROND(self.path)
             self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]
@@ -66,6 +75,9 @@ class DataLoader(baseLoader.DataLoader):
 
         Returns:
             pandas DataFrame/dict: a dataframe of a dataset/a dictionary for key information in the dataset
+
+        Raises:
+            AttributeError: Use the correct format input (df, dict, DeepPurpose)
         """
         if format not in self.support_format:
             raise AttributeError(f"{format} is not supported for current dataset, Please select the format input in {self.support_format}")

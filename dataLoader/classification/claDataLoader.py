@@ -35,9 +35,7 @@ class DataLoader(baseLoader.DataLoader):
         print_stats=False,
     ):
         """
-        Create a base dataloader object that each segmentation task dataloader class can inherit from.
-        Raises:
-            VauleError:
+        Create a base dataloader object that each classification task dataloader class can inherit from.
         """
         
         self.name = name
@@ -77,9 +75,6 @@ class DataLoader(baseLoader.DataLoader):
 
         Returns:
             pandas DataFrame/dict: a dataframe of a dataset/a dictionary for key information in the dataset
-
-        Raises:
-            AttributeError: Use the correct format input (df, dict, DeepPurpose)
         """
         if format not in self.support_format:
             raise AttributeError(f"{format} is not supported for current dataset, Please select the format input in {self.support_format}")

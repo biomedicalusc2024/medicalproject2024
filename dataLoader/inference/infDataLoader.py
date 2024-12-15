@@ -6,10 +6,10 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
-from .chestxrays import getChestXRays
+from .rond import getROND
 
 class DataLoader(baseLoader.DataLoader):
-    """A base data loader class for detection.
+    """A base data loader class for inference.
 
     Args:
         name (str): the dataset name.
@@ -17,10 +17,10 @@ class DataLoader(baseLoader.DataLoader):
         print_stats (bool): Whether to print basic statistics of the dataset
 
     Attributes:
-        trainset (list): a dict of the detection trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        testset (list): a dict of the detection testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        valset (list): a dict of the detection valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        alldata(dict): a dict of the whole detection dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+        trainset (list): a dict of the inference trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+        testset (list): a dict of the inference testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+        valset (list): a dict of the inference valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+        alldata(dict): a dict of the whole inference dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
         name (str): dataset name
         path (str): path to save and retrieve the dataset
         support_format (list<str>): format valid for current dataset
@@ -34,7 +34,7 @@ class DataLoader(baseLoader.DataLoader):
         print_stats=False,
     ):
         """
-        Create a base dataloader object that each detection task dataloader class can inherit from.
+        Create a base dataloader object that each inference task dataloader class can inherit from.
         """
         
         self.name = name
@@ -47,8 +47,8 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if "chestxrays" in self.name:
-            datasets = getChestXRays(self.path)
+        if self.name == "rond":
+            datasets = getROND(self.path)
             self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]
@@ -61,8 +61,8 @@ class DataLoader(baseLoader.DataLoader):
     def get_data(self, format="dict", dataset="all"):
         """
         Arguments:
-            format (str, optional): the returning dataset format, defaults to 'df'
-            dataset (str, optional): which dataset to return, defaults to "training"
+            format (str, optional): the returning dataset format, defaults to 'dict'
+            dataset (str, optional): which dataset to return, defaults to "all"
 
         Returns:
             pandas DataFrame/dict: a dataframe of a dataset/a dictionary for key information in the dataset
