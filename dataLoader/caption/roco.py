@@ -337,13 +337,15 @@ def loadLocalFiles(path, subtitle):
     dataset = {}
     subtitle = "-".join(subtitle.split("_"))
     for folder1 in ["train", "test", "validation"]:
+        image_path = os.path.join(path, folder1, subtitle, "images")
         file_caption = os.path.join(path, folder1, subtitle, "captions.txt")
         df = pd.read_csv(file_caption, sep='	 ', names=["file", "caption"])
         df["file"] = df["file"].apply(lambda x: x+".jpg")
         df.set_index("file", inplace=True)
-        valid_files = os.listdir(os.path.join(path, folder1, subtitle, "images"))
+        valid_files = os.listdir(image_path)
         valid_df = df.loc[valid_files]
         valid_df = valid_df.reset_index()
+        valid_df["file"] = valid_df["file"].apply(lambda x: os.path.join(image_path, x))
         dataset[folder1] = {
             "source": valid_df["file"].to_list(),
             "target": valid_df["caption"].to_list()
