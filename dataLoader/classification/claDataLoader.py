@@ -8,6 +8,7 @@ warnings.filterwarnings("ignore")
 from .. import baseLoader
 from .medMnist import getMedMnist
 from .rond import getROND
+from .chestxrays import getChestXRays
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -49,8 +50,8 @@ class DataLoader(baseLoader.DataLoader):
         self.support_subset = []
 
         if "medmnist" in self.name:
-            sub = self.name.split("-")[-1]
-            datasets = getMedMnist(self.path, sub)
+            subtitle = self.name.split("-")[-1]
+            datasets = getMedMnist(self.path, subtitle)
             self.trainset = datasets[0]
             self.testset = datasets[1]
             self.valset = datasets[2]
@@ -61,6 +62,12 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]
+        elif self.name == "chestxrays":
+            datasets = getChestXRays(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "all"]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
 

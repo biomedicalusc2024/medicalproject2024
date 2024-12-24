@@ -47,7 +47,7 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if "chestxrays" in self.name:
+        if self.name == "chestxrays":
             datasets = getChestXRays(self.path)
             self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
