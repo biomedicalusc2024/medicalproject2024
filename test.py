@@ -1,4 +1,4 @@
-from dataLoader.summerization import DataLoader
+from dataLoader.virtualScreening import DataLoader
 
-dataloader = DataLoader(name="meqsum")
+dataloader = DataLoader(name="zinc")
 breakpoint()
