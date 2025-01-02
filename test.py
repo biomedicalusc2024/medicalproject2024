@@ -1,4 +1,4 @@
-from dataLoader.virtualScreening import DataLoader
+from dataLoader.classification import DataLoader
 
-dataloader = DataLoader(name="zinc")
+dataloader = DataLoader(name="ddiextracion2013")
 breakpoint()

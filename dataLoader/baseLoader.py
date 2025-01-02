@@ -22,7 +22,11 @@ class DataLoader:
             trainset (list): a dict of the NER trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
             testset (list): a dict of the NER testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
             valset (list): a dict of the NER valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-            alldata(dict): a dict of the whole NER dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+            alldata(dict): a dict of the whole dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
+
+            here all source item like source_1 should be a list containing all features dataset provide that can be used and target item similarly.
+            we can add a explanation on both source and target about the meaning of each position in source and target item in print_stats or something else
+
             name (str): dataset name
             path (str): path to save and retrieve the dataset
             support_format (list<str>): format valid for current dataset
