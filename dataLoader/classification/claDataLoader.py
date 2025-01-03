@@ -9,9 +9,11 @@ from .. import baseLoader
 from .medMnist import getMedMnist
 from .rond import getROND
 from .chestxrays import getChestXRays
-from .ddiextraction2013 import getDDIEtraction2013
 from .cirrhosis import getCirrhosis
 from .heartFailurePrediction import getHeartFailurePrediction
+from .hepatitisCPrediction import getHepatitisCPrediction
+from .ptb_xl import getPTB_XL
+from .hoc import getHoC
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -71,20 +73,30 @@ class DataLoader(baseLoader.DataLoader):
             self.testset = datasets[1]
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
-        elif self.name == "ddiextracion2013":
-            datasets = getDDIEtraction2013(self.path)
-            self.trainset = datasets[0]
-            self.testset = datasets[1]
-            self.support_format = ["df", "dict", "DeepPurpose"]
-            self.support_subset = ["train", "test", "all"]
         elif self.name == "cirrhosis":
             datasets = getCirrhosis(self.path)
-            self.trainset = datasets
+            self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]
         elif self.name == "heartFailurePrediction":
             datasets = getHeartFailurePrediction(self.path)
-            self.trainset = datasets
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "hepatitisCPrediction":
+            datasets = getHepatitisCPrediction(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "ptb-xl":
+            datasets = getPTB_XL(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "all"]
+        elif self.name == "hoc":
+            datasets = getHoC(self.path)
+            self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]
         else:
