@@ -14,6 +14,7 @@ from .heartFailurePrediction import getHeartFailurePrediction
 from .hepatitisCPrediction import getHepatitisCPrediction
 from .ptb_xl import getPTB_XL
 from .hoc import getHoC
+from .strokePrediction import getStrokePrediction
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -96,6 +97,11 @@ class DataLoader(baseLoader.DataLoader):
             self.support_subset = ["train", "test", "all"]
         elif self.name == "hoc":
             datasets = getHoC(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "strokePrediction":
+            datasets = getStrokePrediction(self.path)
             self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]

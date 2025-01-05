@@ -1,4 +1,4 @@
-from dataLoader.classification import DataLoader
+from dataLoader.caption import DataLoader
 
-dataloader = DataLoader(name="hoc")
+dataloader = DataLoader(name="pmc-vqa")
 breakpoint()
