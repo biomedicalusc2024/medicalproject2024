@@ -8,8 +8,6 @@ warnings.filterwarnings("ignore")
 from .. import baseLoader
 from .roco import getROCO
 from .iuXray import getIUXray
-from .vqa_rad import getVQA_RAD
-from .pmc_vqa import getPMC_VQA
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -62,17 +60,6 @@ class DataLoader(baseLoader.DataLoader):
             self.support_subset = ["train", "test", "val", "all"]
         elif self.name == "iuxray":
             datasets = getIUXray(self.path)
-            self.trainset = datasets[0]
-            self.testset = datasets[1]
-            self.support_format = ["df", "dict", "DeepPurpose"]
-            self.support_subset = ["train", "test", "all"]
-        elif self.name == "vqa-rad":
-            datasets = getVQA_RAD(self.path)
-            self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
-            self.support_subset = ["all"]
-        elif self.name == "pmc-vqa":
-            datasets = getPMC_VQA(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
             self.support_format = ["df", "dict", "DeepPurpose"]

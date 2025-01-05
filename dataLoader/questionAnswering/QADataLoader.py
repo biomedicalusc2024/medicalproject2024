@@ -7,6 +7,8 @@ warnings.filterwarnings("ignore")
 
 from .. import baseLoader
 from .rond import getROND
+from .vqa_rad import getVQA_RAD
+from .pmc_vqa import getPMC_VQA
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for inference.
@@ -52,6 +54,17 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]
+        elif self.name == "vqa-rad":
+            datasets = getVQA_RAD(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "pmc-vqa":
+            datasets = getPMC_VQA(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "all"]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
 
