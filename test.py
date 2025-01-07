@@ -1,4 +1,4 @@
-from dataLoader.caption import DataLoader
+from dataLoader.namedEntityRecognition import DataLoader
 
-dataloader = DataLoader(name="pmc-vqa")
+dataloader = DataLoader(name="sourceData")
 breakpoint()

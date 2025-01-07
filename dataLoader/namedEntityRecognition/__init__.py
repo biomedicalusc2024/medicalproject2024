@@ -1,1 +1,1 @@
-from .nerDataLoader import DataLoader
+from .NERDataLoader import DataLoader

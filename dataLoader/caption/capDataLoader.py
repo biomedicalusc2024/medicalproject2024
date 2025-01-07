@@ -57,7 +57,7 @@ class DataLoader(baseLoader.DataLoader):
             self.testset = datasets[1]
             self.valset = datasets[2]
             self.support_format = ["df", "dict", "DeepPurpose"]
-            self.support_subset = ["train", "test", "val", "all"]
+            self.support_subset = ["train", "test", "validation", "all"]
         elif self.name == "iuxray":
             datasets = getIUXray(self.path)
             self.trainset = datasets[0]
@@ -69,70 +69,3 @@ class DataLoader(baseLoader.DataLoader):
 
         if print_stats:
             self.print_stats()
-
-    def get_data(self, format="dict", dataset="all"):
-        """
-        Arguments:
-            format (str, optional): the returning dataset format, defaults to 'df'
-            dataset (str, optional): which dataset to return, defaults to "training"
-
-        Returns:
-            pandas DataFrame/dict: a dataframe of a dataset/a dictionary for key information in the dataset
-
-        Raises:
-            AttributeError: Use the correct format input (df, dict, DeepPurpose)
-        """
-        if format not in self.support_format:
-            raise AttributeError(f"{format} is not supported for current dataset, Please select the format input in {self.support_format}")
-        
-        if dataset not in self.support_subset:
-            raise AttributeError(f"{dataset} is not supported for current dataset, Please select the dataset input in {self.support_subset}")
-
-        return self._get_data(format, dataset)
-
-    
-    def _get_data(self, format, dataset):
-        source = []
-        target = []
-        if dataset == "train":
-            source = self.trainset["source"]
-            target = self.trainset["target"]
-        elif dataset == "test":
-            source = self.testset["source"]
-            target = self.testset["target"]
-        elif dataset == "val":
-            source = self.valset["source"]
-            target = self.valset["target"]
-        elif dataset == "all":
-            if self.alldata is not None:
-                source = self.alldata["source"]
-                target = self.alldata["target"]
-            else:
-                if self.trainset is not None:
-                    source = source + self.trainset["source"]
-                    target = target + self.trainset["target"]
-                if self.testset is not None:
-                    source = source + self.testset["source"]
-                    target = target + self.testset["target"]
-                if self.valset is not None:
-                    source = source + self.valset["source"]
-                    target = target + self.valset["target"]
-                if (source==[]) or (target==[]):
-                    raise ValueError("No data in current dataset")
-        else:
-            raise AttributeError(f"{dataset} is not supported for current dataset, Please select the dataset input in {self.support_subset}")
-
-        if format == "df":
-            return pd.DataFrame({
-                "source": source,
-                "target": target
-            })
-        elif format == "dict":
-            return {
-                "source": source,
-                "target": target
-            }
-        elif format == "DeepPurpose":
-            return [[s,t] for s,t in zip(source, target)]
-        else:
-            raise AttributeError(f"{format} is not supported for current dataset, Please select the format input in {self.support_format}")
