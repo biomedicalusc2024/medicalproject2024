@@ -9,6 +9,10 @@ from .. import baseLoader
 from .rond import getROND
 from .vqa_rad import getVQA_RAD
 from .pmc_vqa import getPMC_VQA
+from .pubMedQA import getPubMedQA
+from .medMCQA import getMedMCQA
+from .medQA_USMLE import getMedQA_USMLE
+from .liveQA_PREC_2017 import getLiveQA_PREC_2017
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for inference.
@@ -65,6 +69,34 @@ class DataLoader(baseLoader.DataLoader):
             self.testset = datasets[1]
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
+        elif "pubmedqa" in self.name:
+            subtitle = self.name.split("-")[1]
+            datasets = getPubMedQA(self.path, subtitle)
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif "medmcqa" in self.name:
+            datasets = getMedMCQA(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.valset = datasets[2]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "validation", "all"]
+        elif "medqa_usmle" in self.name:
+            subtitle = self.name.split("-")[1]
+            datasets = getMedQA_USMLE(self.path, subtitle)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.valset = datasets[2]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "validation", "all"]
+        elif "LiveQA_PREC_2017" in self.name:
+            datasets = getLiveQA_PREC_2017(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.valset = datasets[2]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "validation", "all"]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
 

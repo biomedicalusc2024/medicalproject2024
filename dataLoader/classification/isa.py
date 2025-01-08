@@ -361,7 +361,7 @@ def create_train_test_splits_hard(datasetPath, graph, num_negative_test, num_neg
     return train_neg, test_neg
 
 
-def processData(dataPath):
+def processData(dataPath, is_hard):
     original_graph = read_graph(file=os.path.join(dataPath,"isa.edgelist"), get_connected_graph=True, remove_selfloops=True, get_directed=False)
     num_nodes = original_graph.number_of_nodes()
     num_edges = original_graph.number_of_edges()
@@ -381,13 +381,14 @@ def processData(dataPath):
     num_neg_test = len(test_pos)
     num_neg_train = len(train_pos)
 
-    train_neg_hard, test_neg_hard = create_train_test_splits_hard(dataPath, original_graph, num_neg_test, num_neg_train)
+    if is_hard:
+        train_neg_hard, test_neg_hard = create_train_test_splits_hard(dataPath, original_graph, num_neg_test, num_neg_train)
 
-    print('Hard dataset created for the {} dataset.'.format("IS-A"))
-    print('Number of positive training samples: ', len(train_pos))
-    print('Number of negative hard training samples: ', len(train_neg_hard))
-    print('Number of positive testing samples: ', len(test_pos))
-    print('Number of negative hard testing samples: ', len(test_neg_hard))
+        print('Hard dataset created for the {} dataset.'.format("IS-A"))
+        print('Number of positive training samples: ', len(train_pos))
+        print('Number of negative hard training samples: ', len(train_neg_hard))
+        print('Number of positive testing samples: ', len(test_pos))
+        print('Number of negative hard testing samples: ', len(test_neg_hard))
 
 
 def getIS_A(path, subtitle):
@@ -400,12 +401,13 @@ def datasetLoad(url, subtitle, path, datasetName):
         datasetPath = os.path.join(path, datasetName)
         datasetFile = os.path.join(datasetPath, "isa.edgelist")
         dataSplitPath = os.path.join(datasetPath, f"IS-A_{subtitle}_splits")
+        is_hard = (subtitle == "hard")
         if os.path.exists(dataSplitPath):
             print_sys("Found local copy...")
             return loadLocalFiles(dataSplitPath)
         else:
             if os.path.exists(datasetFile):
-                processData(datasetPath)
+                processData(datasetPath, is_hard)
                 return loadLocalFiles(dataSplitPath)
             else:
                 print_sys("Downloading...")
@@ -427,7 +429,7 @@ def datasetLoad(url, subtitle, path, datasetName):
                         if pbar:
                             pbar.close()
                     print_sys("Download complete.")
-                    processData(datasetPath)
+                    processData(datasetPath, is_hard)
                     return loadLocalFiles(dataSplitPath)
                 else:
                     print_sys("Connection error, please check the internet.")
