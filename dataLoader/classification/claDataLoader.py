@@ -16,6 +16,7 @@ from .ptb_xl import getPTB_XL
 from .hoc import getHoC
 from .strokePrediction import getStrokePrediction
 from .isa import getIS_A
+from .cheXpert_small import getCheXpert_small
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -70,6 +71,12 @@ class DataLoader(baseLoader.DataLoader):
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]
         elif self.name == "chestxrays":
+            datasets = getChestXRays(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "all"]
+        elif self.name == "cheXpert_small":
             datasets = getChestXRays(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
