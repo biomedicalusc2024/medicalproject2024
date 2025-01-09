@@ -14,3 +14,7 @@ problems:
     NamedEntityRecognition/DDIExtraction2013: not clear how to use data downloaded, need further explanation
     QuestionAnswering/LiveQA_PREC_2017: training set are deleted on github, only test set left.
     Summerization/PubMed: Error when loading dataset using datasets from huggingface, not clear how to fix
+    QuestionAnswering/RadQA: some dataset need registeration to download.
+    QuestionAnswering/CliCR: need to send request email to acquire link for data.
+    QuestionAnswering/CT_RATE: need to access token on huggingface.
+    QuestionAnswering/LLaVA_Med: not clear how to use data downloaded, need further explanation

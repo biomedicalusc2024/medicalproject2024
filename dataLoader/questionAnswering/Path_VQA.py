@@ -12,20 +12,20 @@ warnings.filterwarnings("ignore")
 from ..utils import print_sys
 
 
-def getSourceData(path):
+def getPath_VQA(path):
     try:
-        data_path = os.path.join(path, "SourceData")
+        data_path = os.path.join(path, "Path_VQA")
         if os.path.exists(data_path):
             ds = datasets.load_from_disk(data_path)
         else:
-            ds = datasets.load_dataset("EMBO/SourceData", "NER", version="2.0.3", trust_remote_code=True)
+            ds = datasets.load_dataset("flaviagiammarino/path-vqa", trust_remote_code=True)
             ds.save_to_disk(data_path)
             
         df_train = ds["train"].to_pandas()
         df_test = ds["test"].to_pandas()
         df_val = ds["validation"].to_pandas()
-        source_cols = ['words', 'labels', 'text']
-        target_cols = ['tag_mask']
+        source_cols = ['image', 'question']
+        target_cols = ['answer']
 
         dataset_train = {
             "source": df_train[source_cols].to_numpy().tolist(),

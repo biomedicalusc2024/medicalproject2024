@@ -13,6 +13,10 @@ from .pubMedQA import getPubMedQA
 from .medMCQA import getMedMCQA
 from .medQA_USMLE import getMedQA_USMLE
 from .liveQA_PREC_2017 import getLiveQA_PREC_2017
+from .medicationQA import getMedicationQA
+from .CT_RATE import getCT_RATE
+from .LLaVA_Med import getLLaVA_Med
+from .Path_VQA import getPath_VQA
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for inference.
@@ -75,7 +79,7 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]
-        elif "medmcqa" in self.name:
+        elif self.name == "medmcqa":
             datasets = getMedMCQA(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
@@ -90,8 +94,30 @@ class DataLoader(baseLoader.DataLoader):
             self.valset = datasets[2]
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["train", "test", "validation", "all"]
-        elif "LiveQA_PREC_2017" in self.name:
+        elif self.name == "LiveQA_PREC_2017":
             datasets = getLiveQA_PREC_2017(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.valset = datasets[2]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "validation", "all"]
+        elif self.name == "MedicationQA":
+            datasets = getMedicationQA(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "CT_RATE":
+            datasets = getCT_RATE(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "LLaVA_Med":
+            datasets = getLLaVA_Med(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "Path_VQA":
+            datasets = getPath_VQA(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
             self.valset = datasets[2]
