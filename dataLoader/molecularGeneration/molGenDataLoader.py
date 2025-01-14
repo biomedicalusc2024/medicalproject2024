@@ -6,9 +6,8 @@ import warnings
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
-from .pubmed import getPubMed
-from .meqsum import getMeQSum
-from .TREC import getTREC
+from .MOSES import getMOSES
+from .CrossDocked2020 import getCrossDocked2020
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -51,15 +50,14 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if self.name == "pubmed":
-            datasets = getPubMed(self.path)
-        elif self.name == "meqsum":
-            datasets = getMeQSum(self.path)
-            self.alldata = datasets
+        if self.name == "MOSES":
+            datasets = getMOSES(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
             self.support_format = ["df", "dict", "DeepPurpose"]
-            self.support_subset = ["all"]
-        elif self.name == "trec":
-            datasets = getTREC(self.path)
+            self.support_subset = ["train", "test", "all"]
+        elif self.name == "CrossDocked2020":
+            datasets = getCrossDocked2020(self.path)
             self.alldata = datasets
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["all"]

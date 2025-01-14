@@ -18,3 +18,9 @@ problems:
     QuestionAnswering/CliCR: need to send request email to acquire link for data.
     QuestionAnswering/CT_RATE: need to access token on huggingface.
     QuestionAnswering/LLaVA_Med: not clear how to use data downloaded, need further explanation
+    QuestionAnswering/QUILT-1M: limited access.
+    QuestionAnswering/WSI_VQA: img resource not provided, need to download manually.
+    Caption/PadChest: need requests.
+    VisualGrouping/ChestX_ray8: dataEntity and split file has no direct urls, data resource can be downloaded.
+    MolecularGeneration/CrossDocked2020: Dataset is too big and too much files, download is done but need advice on how to provide to user.
+    summerization/TREC: need explanation on loading which part of xml file.

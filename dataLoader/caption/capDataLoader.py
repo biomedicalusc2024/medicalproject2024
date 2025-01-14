@@ -8,6 +8,7 @@ warnings.filterwarnings("ignore")
 from .. import baseLoader
 from .roco import getROCO
 from .iuXray import getIUXray
+from .PMC_OA import getPMC_OA
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -64,6 +65,11 @@ class DataLoader(baseLoader.DataLoader):
             self.testset = datasets[1]
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
+        elif self.name == "PMC_OA":
+            datasets = getPMC_OA(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["all"]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
 

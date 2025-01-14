@@ -1,4 +1,4 @@
-from dataLoader.questionAnswering import DataLoader
+from dataLoader.summerization import DataLoader
 
-dataloader = DataLoader(name="Path_VQA")
+dataloader = DataLoader(name="trec")
 breakpoint()

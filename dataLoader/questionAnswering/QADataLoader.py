@@ -17,6 +17,7 @@ from .medicationQA import getMedicationQA
 from .CT_RATE import getCT_RATE
 from .LLaVA_Med import getLLaVA_Med
 from .Path_VQA import getPath_VQA
+from .WSI_VQA import getWSI_VQA
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for inference.
@@ -118,6 +119,13 @@ class DataLoader(baseLoader.DataLoader):
             self.support_subset = ["all"]
         elif self.name == "Path_VQA":
             datasets = getPath_VQA(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.valset = datasets[2]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "validation", "all"]
+        elif self.name == "WSI_VQA":
+            datasets = getWSI_VQA(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
             self.valset = datasets[2]

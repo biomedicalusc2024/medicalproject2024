@@ -7,6 +7,7 @@ warnings.filterwarnings("ignore")
 
 from .. import baseLoader
 from .slake import getSLAKE
+from .ChestX_ray8 import getChestX_ray8
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -56,6 +57,12 @@ class DataLoader(baseLoader.DataLoader):
             self.valset = datasets[2]
             self.support_format = ["df", "dict", "DeepPurpose"]
             self.support_subset = ["train", "test", "validation", "all"]
+        elif self.name == "ChestX_ray8":
+            datasets = getChestX_ray8(self.path)
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
+            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_subset = ["train", "test", "all"]
         else:
             raise ValueError(f"Dataset {self.name} is not supported.")
 
