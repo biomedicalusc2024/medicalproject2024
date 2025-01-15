@@ -16,15 +16,11 @@ warnings.filterwarnings("ignore")
 from ..utils import print_sys, download_file
 
 
-def getTREC(path):
+def getExtMarker(path):
     urls = [
-        'https://www.trec-cds.org/2021_data/ClinicalTrials.2021-04-27.part1.zip',
-        'https://www.trec-cds.org/2021_data/ClinicalTrials.2021-04-27.part2.zip',
-        'https://www.trec-cds.org/2021_data/ClinicalTrials.2021-04-27.part3.zip',
-        'https://www.trec-cds.org/2021_data/ClinicalTrials.2021-04-27.part4.zip',
-        'https://www.trec-cds.org/2021_data/ClinicalTrials.2021-04-27.part5.zip',
+        'https://github.com/pohl-michel/time-series-forecasting-with-UORO-RTRL-LMS-and-linear-regression/archive/refs/heads/main.zip',
     ]
-    return datasetLoad(urls, path=path, datasetName="TREC")
+    return datasetLoad(urls, path=path, datasetName="ExtMarker")
 
 
 def datasetLoad(urls, path, datasetName):
@@ -40,10 +36,11 @@ def datasetLoad(urls, path, datasetName):
                 print('downloading '+fn+'...')
                 download_file(url, os.path.join(datasetPath, fn), datasetPath)
             
-            for subdir in os.listdir(datasetPath):
-                for f in os.listdir(os.path.join(datasetPath, subdir)):
-                    shutil.move(os.path.join(datasetPath, subdir, f), os.path.join(datasetPath, f))
-                shutil.rmtree(os.path.join(datasetPath, subdir))
+            datafolder = os.path.join(datasetPath,"time-series-forecasting-with-UORO-RTRL-LMS-and-linear-regression-main","Original data")
+            for fn in os.listdir(datafolder):
+                shutil.move(os.path.join(datafolder,fn), datasetPath)
+
+            shutil.rmtree(os.path.join(datasetPath,"time-series-forecasting-with-UORO-RTRL-LMS-and-linear-regression-main"))
 
             return loadLocalFiles(datasetPath)
         
