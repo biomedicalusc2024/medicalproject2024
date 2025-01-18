@@ -1,13 +1,9 @@
 # Medical Project
 
 dataloader idea:
-    load every dataset in following format: self.trainset = [[source_1, target_1], ..., [source_n, target_n]] where source_i = [feature_1, ..., feature_m] containing all source related feature and target_i = [feature_1, ..., feature_k] containing all target related feature.(or just one list containing all features)
-
-    explain in print_stats what each position in source and target represent, what subdataset(train, test, val or only all) are supported and what format are supported.
+    load every dataset in following format: self.trainset = [{"img_path": str, "mask_path": str, ...}, ...]
 
     maybe maintaining a list in README on which datasets are done and if challenged, what is the problem.
-
-    maybe we need some rule on naming and reference of dataset
 
     maybe add a file or something to mark everything is downloaded and no need to download again next time used
 
