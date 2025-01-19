@@ -10,22 +10,8 @@ from .PMC_OA import getPMC_OA
 SUPPORTED_DATASETS = [f"ROCO-{sub}" for sub in ROCO_SUBTITLE] + ["IUXray", "PMC_OA"]
 
 class DataLoader(baseLoader.DataLoader):
-    """A base data loader class for classification.
-
-    Args:
-        name (str): the dataset name.
-        path (str): The path to save the data file
-        print_stats (bool): Whether to print basic statistics of the dataset
-
-    Attributes:
-        trainset (list): a dict of the classification trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        testset (list): a dict of the classification testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        valset (list): a dict of the classification valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        alldata(dict): a dict of the whole classification dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        name (str): dataset name
-        path (str): path to save and retrieve the dataset
-        support_format (list<str>): format valid for current dataset
-        support_subset (list<str>): subset valid for current dataset
+    """
+    refer to baseLoader
     """
 
     def __init__(
@@ -34,12 +20,6 @@ class DataLoader(baseLoader.DataLoader):
         path="./data",
         print_stats=False,
     ):
-        """
-        Create a base dataloader object that each segmentation task dataloader class can inherit from.
-        Raises:
-            VauleError:
-        """
-        
         self.name = name
         self.path = path
 

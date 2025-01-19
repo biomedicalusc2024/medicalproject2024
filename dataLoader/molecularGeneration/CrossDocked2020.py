@@ -12,7 +12,7 @@ from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
-from ..utils import print_sys
+from ..utils import print_sys, download_file
 
 
 def getCrossDocked2020(path):
@@ -87,55 +87,3 @@ def loadLocalFiles(path):
     
     return trainset, testset
     
-
-
-def download_file(url, destination, extractionPath=None):
-    try:
-        response = requests.get(url, stream=True)
-        if response.status_code == 200:
-            total_size = int(response.headers.get('content-length', 0))
-
-            with open(destination, "wb") as file:
-                if total_size == 0:
-                    pbar = None
-                else:
-                    pbar = tqdm(total=total_size, unit='iB', unit_scale=True)
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        file.write(chunk)
-                        if pbar:
-                            pbar.update(len(chunk))
-                if pbar:
-                    pbar.close()
-            print_sys(f"Download {destination} complete.")
-
-            if extractionPath:
-                if "zip" in destination:
-                    with zipfile.ZipFile(destination, "r") as z:
-                        z.extractall(extractionPath)
-                    print_sys("Extraction complete.")
-                    os.remove(destination)
-                elif "rar" in destination:
-                    with rarfile.RarFile(destination) as rf:
-                        rf.extractall(extractionPath)
-                    print_sys("Extraction complete.")
-                    os.remove(destination)
-                elif "tar" in destination:
-                    if "gz" in destination:
-                        with tarfile.open(destination, 'r:gz') as tar:
-                            tar.extractall(extractionPath)
-                        print_sys("Extraction complete.")
-                        os.remove(destination)
-                    else:
-                        with tarfile.open(destination, 'r') as tar:
-                            tar.extractall(extractionPath)
-                        print_sys("Extraction complete.")
-                        os.remove(destination)
-                elif "tgz" in destination:
-                    with tarfile.open(destination, 'r:gz') as tar:
-                        tar.extractall(extractionPath)
-                    print_sys("Extraction complete.")
-                    os.remove(destination)
-
-    except Exception as e:
-        print_sys(f"error: {e}")

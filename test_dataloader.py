@@ -1,4 +1,4 @@
-from dataLoader.detection import DataLoader
+from dataLoader.namedEntityRecognition import DataLoader
 
-dataloader = DataLoader(name="a")
+dataloader = DataLoader(name="DDIEtraction2013")
 breakpoint()

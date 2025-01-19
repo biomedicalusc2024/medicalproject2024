@@ -19,13 +19,10 @@ class DataLoader:
         """
         empty data loader class, to be overwritten
         basic attributes: (alldata can be none when any of train, test, val is not)
-            trainset (list): a dict of the NER trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-            testset (list): a dict of the NER testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-            valset (list): a dict of the NER valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-            alldata(dict): a dict of the whole dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-
-            here all source item like source_1 should be a list containing all features dataset provide that can be used and target item similarly.
-            we can add a explanation on both source and target about the meaning of each position in source and target item in print_stats or something else
+            trainset (list): a dict of the trainset if exist([{"f1":data_1_1,...},...])
+            testset (list): a dict of the testset if exist([{"f1":data_1_1,...},...])
+            valset (list): a dict of the valset if exist([{"f1":data_1_1,...},...])
+            alldata(dict): a dict of the whole dataset if exist([{"f1":data_1_1,...},...])
 
             name (str): dataset name
             path (str): path to save and retrieve the dataset
