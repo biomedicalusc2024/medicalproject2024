@@ -12,6 +12,7 @@ warnings.filterwarnings("ignore")
 from ..utils import print_sys
 
 
+# tested by tjl 2025/1/17
 def getIUXray(path):
     try:
         dataPath = os.path.join(path, "IUXray")
@@ -170,14 +171,11 @@ def splitFile(dataPath):
 def loadLocalFiles(dataPath):
     train_path = os.path.join(dataPath, "train_images.tsv")
     test_path = os.path.join(dataPath, "test_images.tsv")
-    df_train = pd.read_csv(train_path, sep='\t', names=["source", "target"])
-    df_test = pd.read_csv(test_path, sep='\t', names=["source", "target"])
-    dataset_train = {
-        "source": [[s] for s in df_train["source"].to_numpy().tolist()],
-        "target": [[s] for s in df_train["target"].to_numpy().tolist()],
-    }
-    dataset_test = {
-        "source": [[s] for s in df_test["source"].to_numpy().tolist()],
-        "target": [[s] for s in df_test["target"].to_numpy().tolist()],
-    }
+
+    df_train = pd.read_csv(train_path, sep='\t', names=["img_path", "caption"])
+    df_test = pd.read_csv(test_path, sep='\t', names=["img_path", "caption"])
+
+    dataset_train = df_train.to_dict(orient='records')
+    dataset_test = df_test.to_dict(orient='records')
+
     return dataset_train, dataset_test

@@ -1,4 +1,4 @@
-from dataLoader.database import DataLoader
+from dataLoader.detection import DataLoader
 
-dataloader = DataLoader(name="CORD19-metadata")
+dataloader = DataLoader(name="a")
 breakpoint()

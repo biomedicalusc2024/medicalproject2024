@@ -1,14 +1,13 @@
-import pandas as pd
-import numpy as np
-import os, sys, json
 import warnings
 
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
-from .roco import getROCO
-from .iuXray import getIUXray
+from .ROCO import getROCO, ROCO_SUBTITLE
+from .IUXray import getIUXray
 from .PMC_OA import getPMC_OA
+
+SUPPORTED_DATASETS = [f"ROCO-{sub}" for sub in ROCO_SUBTITLE] + ["IUXray", "PMC_OA"]
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -51,27 +50,27 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if "roco" in self.name:
+        if "ROCO" in self.name:
             subtitle = self.name.split("-")[-1]
             datasets = getROCO(self.path, subtitle)
             self.trainset = datasets[0]
             self.testset = datasets[1]
             self.valset = datasets[2]
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "validation", "all"]
-        elif self.name == "iuxray":
+        elif self.name == "IUXray":
             datasets = getIUXray(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
         elif self.name == "PMC_OA":
             datasets = getPMC_OA(self.path)
             self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
         else:
-            raise ValueError(f"Dataset {self.name} is not supported.")
+            raise ValueError(f"Dataset {self.name} is not supported. Please select name in {SUPPORTED_DATASETS}.")
 
         if print_stats:
             self.print_stats()

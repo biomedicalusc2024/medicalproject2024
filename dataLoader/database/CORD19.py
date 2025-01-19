@@ -1,19 +1,18 @@
 import os
-import re
-import requests
 import warnings
 import datasets
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
 from ..utils import print_sys
 
+CORD19_SUBTITLE = ["metadata", "fulltext", "embeddings"]
+
 
 # tested by tjl 2025/1/17
 def getCORD19(path, subtitle):
+    if subtitle not in CORD19_SUBTITLE:
+        raise AttributeError(f"please select subtitle in {CORD19_SUBTITLE}, enter name in format: CORD19-subtitle.")
     try:
         data_path = os.path.join(path, "CORD19")
         if os.path.exists(data_path):
@@ -29,5 +28,4 @@ def getCORD19(path, subtitle):
         return dataset_train
 
     except Exception as e:
-        breakpoint()
         print_sys(f"error: {e}")

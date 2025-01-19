@@ -18,7 +18,10 @@ import xml.etree.ElementTree as ET
 
 from ..utils import print_sys
 
+
+# tested by tjl 2025/1/18
 tempfile.gettempdir()
+ROCO_SUBTITLE = ["radiology", "non_radiology"]
 
 DLINKS_FOLDERS = [
     'data/test/radiology',
@@ -298,7 +301,7 @@ def parse_args():
     parser.add_argument(
         '-r', '--num-retries',
         help='number of retries for failed downloads before giving up',
-        default=10,
+        default=3,
         type=int,
     )
 
@@ -346,15 +349,12 @@ def loadLocalFiles(path, subtitle):
         valid_df = df.loc[valid_files]
         valid_df = valid_df.reset_index()
         valid_df["file"] = valid_df["file"].apply(lambda x: os.path.join(image_path, x))
-        dataset[folder1] = {
-            "source": valid_df["file"].to_list(),
-            "target": valid_df["caption"].to_list()
-        }
+        dataset[folder1] = valid_df.to_dict(orient='records')
     return dataset["train"], dataset["test"], dataset["validation"]
 
 
 def getROCO(path, subtitle):
-    if subtitle not in ["radiology", "non_radiology"]:
+    if subtitle not in ROCO_SUBTITLE:
         raise AttributeError('Please enter dataset name in MedMnist-subset format and select the subsection of MedMnist in ["radiology", "non_radiology"]')
     else:
         return fetch_and_extract(path, subtitle)

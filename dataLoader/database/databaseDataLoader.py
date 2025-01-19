@@ -1,12 +1,11 @@
-import pandas as pd
-import numpy as np
-import os, sys, json
 import warnings
 
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
-from .CORD19 import getCORD19
+from .CORD19 import getCORD19, CORD19_SUBTITLE
+
+SUPPORTED_DATASETS = [f"CORD19-{sub}" for sub in CORD19_SUBTITLE] + []
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for classification.
@@ -56,7 +55,7 @@ class DataLoader(baseLoader.DataLoader):
             self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
         else:
-            raise ValueError(f"Dataset {self.name} is not supported.")
+            raise ValueError(f"Dataset {self.name} is not supported. Please select name in {SUPPORTED_DATASETS}.")
 
         if print_stats:
             self.print_stats()

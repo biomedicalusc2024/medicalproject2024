@@ -1,12 +1,11 @@
-import pandas as pd
-import numpy as np
-import os, sys, json
 import warnings
 
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
-from .chestxrays import getChestXRays
+from .ChestXRays import getChestXRays
+
+SUPPORTED_DATASETS = ["ChestXRays"]
 
 class DataLoader(baseLoader.DataLoader):
     """A base data loader class for detection.
@@ -47,13 +46,13 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if self.name == "chestxrays":
+        if self.name == "ChestXRays":
             datasets = getChestXRays(self.path)
             self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
         else:
-            raise ValueError(f"Dataset {self.name} is not supported.")
+            raise ValueError(f"Dataset {self.name} is not supported. Please select name in {SUPPORTED_DATASETS}.")
 
         if print_stats:
             self.print_stats()
