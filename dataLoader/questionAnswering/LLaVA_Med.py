@@ -1,19 +1,15 @@
 import os
 import json
 import shutil
-import rarfile
-import tarfile
-import zipfile
-import requests
 import warnings
-import numpy as np
-import pandas as pd
 from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
-from ..utils import print_sys
+from ..utils import print_sys, download_file
 
+
+# need guidance on data needed
 def getLLaVA_Med(path):
     urls = [
         'https://hanoverprod.z21.web.core.windows.net/med_llava/alignment/llava_med_alignment_500k.json',
@@ -59,7 +55,7 @@ def datasetLoad(urls, path, datasetName):
             print('Downloading PMC articles')
             pmc_path = os.path.join(datasetPath,'pmc_articles')
             img_path = os.path.join(datasetPath,'images')
-            for idx, sample in enumerate(tqdm(input_data)):
+            for _, sample in enumerate(tqdm(input_data)):
                 try:
                     download_file(sample['pmc_tar_url'], os.path.join(pmc_path, os.path.basename(sample['pmc_tar_url'])), pmc_path)
                     src = os.path.join(pmc_path, sample['image_file_path'])
@@ -69,53 +65,6 @@ def datasetLoad(urls, path, datasetName):
                     print('Error downloading PMC article: {}'.format(sample['pmc_tar_url']))
                     continue
         
-    except Exception as e:
-        print_sys(f"error: {e}")
-
-
-def download_file(url, destination, extractionPath=None):
-    try:
-        response = requests.get(url, stream=True)
-        if response.status_code == 200:
-            total_size = int(response.headers.get('content-length', 0))
-
-            with open(destination, "wb") as file:
-                if total_size == 0:
-                    pbar = None
-                else:
-                    pbar = tqdm(total=total_size, unit='iB', unit_scale=True)
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        file.write(chunk)
-                        if pbar:
-                            pbar.update(len(chunk))
-                if pbar:
-                    pbar.close()
-            print_sys("Download complete.")
-
-            if extractionPath:
-                if "zip" in destination:
-                    with zipfile.ZipFile(destination, "r") as z:
-                        z.extractall(extractionPath)
-                    print_sys("Extraction complete.")
-                    os.remove(destination)
-                elif "rar" in destination:
-                    with rarfile.RarFile(destination) as rf:
-                        rf.extractall(extractionPath)
-                    print_sys("Extraction complete.")
-                    os.remove(destination)
-                elif "tar" in destination:
-                    if "gz" in destination:
-                        with tarfile.open(destination, 'r:gz') as tar:
-                            tar.extractall(extractionPath)
-                        print_sys("Extraction complete.")
-                        os.remove(destination)
-                    else:
-                        with tarfile.open(destination, 'r') as tar:
-                            tar.extractall(extractionPath)
-                        print_sys("Extraction complete.")
-                        os.remove(destination)
-
     except Exception as e:
         print_sys(f"error: {e}")
 

@@ -1,4 +1,4 @@
-from dataLoader.namedEntityRecognition import DataLoader
+from dataLoader.questionAnswering import DataLoader
 
-dataloader = DataLoader(name="DDIEtraction2013")
+dataloader = DataLoader(name="WSI_VQA")
 breakpoint()

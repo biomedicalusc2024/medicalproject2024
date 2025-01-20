@@ -1,17 +1,13 @@
 import os
-import re
-import requests
 import warnings
 import datasets
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
 from ..utils import print_sys
 
 
+# tested by tjl 2025/1/19
 def getMedicationQA(path):
     try:
         data_path = os.path.join(path, "MedicationQA")
@@ -22,14 +18,7 @@ def getMedicationQA(path):
             ds.save_to_disk(data_path)
             
         df = ds["train"].to_pandas()
-        source_cols = ['Question', 'Focus (Drug)', 'Question Type', 'Section Title', 'URL']
-        target_cols = ['Answer']
-
-        dataset = {
-            "source": df[source_cols].to_numpy().tolist(),
-            "target": df[target_cols].to_numpy().tolist()
-        }
-
+        dataset = df.to_dict(orient='records')
         return dataset
 
     except Exception as e:

@@ -1,19 +1,13 @@
 import os
-import json
-import shutil
-import rarfile
-import tarfile
-import zipfile
-import requests
 import warnings
-import numpy as np
 import pandas as pd
-from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
-from ..utils import print_sys
+from ..utils import print_sys, download_file
 
+
+# img resource not provided, need to download manually.
 def getWSI_VQA(path):
     urls = [
         'https://raw.githubusercontent.com/cpystan/WSI-VQA/master/dataset/WSI_captions/WsiVQA_train.json',
@@ -38,53 +32,6 @@ def datasetLoad(urls, path, datasetName):
 
             return loadLocalFiles(datasetPath)
         
-    except Exception as e:
-        print_sys(f"error: {e}")
-
-
-def download_file(url, destination, extractionPath=None):
-    try:
-        response = requests.get(url, stream=True)
-        if response.status_code == 200:
-            total_size = int(response.headers.get('content-length', 0))
-
-            with open(destination, "wb") as file:
-                if total_size == 0:
-                    pbar = None
-                else:
-                    pbar = tqdm(total=total_size, unit='iB', unit_scale=True)
-                for chunk in response.iter_content(chunk_size=8192):
-                    if chunk:
-                        file.write(chunk)
-                        if pbar:
-                            pbar.update(len(chunk))
-                if pbar:
-                    pbar.close()
-            print_sys("Download complete.")
-
-            if extractionPath:
-                if "zip" in destination:
-                    with zipfile.ZipFile(destination, "r") as z:
-                        z.extractall(extractionPath)
-                    print_sys("Extraction complete.")
-                    os.remove(destination)
-                elif "rar" in destination:
-                    with rarfile.RarFile(destination) as rf:
-                        rf.extractall(extractionPath)
-                    print_sys("Extraction complete.")
-                    os.remove(destination)
-                elif "tar" in destination:
-                    if "gz" in destination:
-                        with tarfile.open(destination, 'r:gz') as tar:
-                            tar.extractall(extractionPath)
-                        print_sys("Extraction complete.")
-                        os.remove(destination)
-                    else:
-                        with tarfile.open(destination, 'r') as tar:
-                            tar.extractall(extractionPath)
-                        print_sys("Extraction complete.")
-                        os.remove(destination)
-
     except Exception as e:
         print_sys(f"error: {e}")
 
