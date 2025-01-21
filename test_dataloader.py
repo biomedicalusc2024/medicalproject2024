@@ -1,4 +1,4 @@
-from dataLoader.questionAnswering import DataLoader
+from dataLoader.visualGrouping import DataLoader
 
-dataloader = DataLoader(name="WSI_VQA")
+dataloader = DataLoader(name="ChestX_ray8")
 breakpoint()

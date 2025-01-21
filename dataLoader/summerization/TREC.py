@@ -1,10 +1,6 @@
 import os
 import json
 import shutil
-import rarfile
-import tarfile
-import zipfile
-import requests
 import warnings
 import numpy as np
 import pandas as pd

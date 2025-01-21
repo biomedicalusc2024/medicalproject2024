@@ -19,6 +19,6 @@ problems:
     QuestionAnswering/QUILT-1M: limited access.
     QuestionAnswering/WSI_VQA: img resource not provided, need to download manually.
     Caption/PadChest: need requests.
-    VisualGrouping/ChestX_ray8: dataEntity and split file has no direct urls, data resource can be downloaded.
+    VisualGrouping/ChestX_ray8: dataEntity and split file has no direct urls, data resource can be downloaded. Seem same with detaction/ChestXRays.
     MolecularGeneration/CrossDocked2020: Dataset is too big and too much files, download is done but need advice on how to provide to user.
     summerization/TREC: need explanation on loading which part of xml file.

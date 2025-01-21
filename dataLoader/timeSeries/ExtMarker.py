@@ -1,21 +1,14 @@
 import os
-import json
 import shutil
-import rarfile
-import tarfile
-import zipfile
-import requests
 import warnings
-import numpy as np
 import pandas as pd
-from tqdm import tqdm
-import xml.etree.ElementTree as ET
 
 warnings.filterwarnings("ignore")
 
 from ..utils import print_sys, download_file
 
 
+# tested by tjl 2025/1/20
 def getExtMarker(path):
     urls = [
         'https://github.com/pohl-michel/time-series-forecasting-with-UORO-RTRL-LMS-and-linear-regression/archive/refs/heads/main.zip',
@@ -49,4 +42,11 @@ def datasetLoad(urls, path, datasetName):
 
 
 def loadLocalFiles(path):
-    breakpoint()
+    fn_list = [fn for fn in os.listdir(path) if "csv" in fn]
+    dataset = []
+    for fn in fn_list:
+        fn_full = os.path.join(path,fn)
+        df = pd.read_csv(fn_full, sep=";")
+        df["source"] = fn_full
+        dataset += df.to_dict(orient='records')
+    return dataset
