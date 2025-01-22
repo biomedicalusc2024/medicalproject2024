@@ -43,7 +43,7 @@ def loadLocalFiles(path, subtitle):
     elif subtitle == "US":
         basePath = os.path.join(basePath, "US")
     else:
-        raise AttributeError(f'Please enter dataset name in MedMnist-subset format and select the subsection of MedMnist in {MedQA_USMLE_SUBTITLE}')
+        raise AttributeError(f'Please enter dataset name in MedQA_USMLE-subset format and select the subsection of MedQA_USMLE in {MedQA_USMLE_SUBTITLE}')
     
     df_train = pd.read_json(os.path.join(basePath, "train.jsonl"), lines=True)
     df_test = pd.read_json(os.path.join(basePath, "test.jsonl"), lines=True)

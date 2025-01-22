@@ -1,40 +1,28 @@
-import pandas as pd
-import numpy as np
-import os, sys, json
 import warnings
 
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
-from .medMnist import getMedMnist
-from .rond import getROND
-from .chestxrays import getChestXRays
-from .cirrhosis import getCirrhosis
-from .heartFailurePrediction import getHeartFailurePrediction
-from .hepatitisCPrediction import getHepatitisCPrediction
-from .ptb_xl import getPTB_XL
-from .hoc import getHoC
-from .strokePrediction import getStrokePrediction
-from .isa import getIS_A
-from .cheXpert_small import getCheXpert_small
+from .HoC import getHoC
+from .ROND import getROND
+from .PTB_XL import getPTB_XL
+from .Cirrhosis import getCirrhosis
+from .ChestXRays import getChestXRays
+from .CheXpert_small import getCheXpert_small
+from .StrokePrediction import getStrokePrediction
+from .HepatitisCPrediction import getHepatitisCPrediction
+from .HeartFailurePrediction import getHeartFailurePrediction
+from .IS_A import getIS_A, IS_A_SUBTITLE
+from .MedMnist import getMedMnist, MedMnist_SUBTITLE
+
+SUPPORTED_DATASETS = [f"MedMnist-{sub}" for sub in MedMnist_SUBTITLE]
+SUPPORTED_DATASETS += [f"IS_A-{sub}" for sub in IS_A_SUBTITLE]
+SUPPORTED_DATASETS += ["ROND", "ChestXRays", "CheXpert_small", "Cirrhosis", "HeartFailurePrediction", 
+                       "HepatitisCPrediction", "PTB_XL", "HoC", "StrokePrediction"]
 
 class DataLoader(baseLoader.DataLoader):
-    """A base data loader class for classification.
-
-    Args:
-        name (str): the dataset name.
-        path (str): The path to save the data file
-        print_stats (bool): Whether to print basic statistics of the dataset
-
-    Attributes:
-        trainset (list): a dict of the classification trainset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        testset (list): a dict of the classification testset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        valset (list): a dict of the classification valset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        alldata(dict): a dict of the whole classification dataset if exist({"source": [source_1, ...], "target": [target_1, ...]})
-        name (str): dataset name
-        path (str): path to save and retrieve the dataset
-        support_format (list<str>): format valid for current dataset
-        support_subset (list<str>): subset valid for current dataset
+    """
+    refer to baseLoader
     """
 
     def __init__(
@@ -43,10 +31,6 @@ class DataLoader(baseLoader.DataLoader):
         path="./data",
         print_stats=False,
     ):
-        """
-        Create a base dataloader object that each classification task dataloader class can inherit from.
-        """
-        
         self.name = name
         self.path = path
 
@@ -57,71 +41,71 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if "medmnist" in self.name:
+        if "MedMnist" in self.name:
             subtitle = self.name.split("-")[-1]
             datasets = getMedMnist(self.path, subtitle)
             self.trainset = datasets[0]
             self.testset = datasets[1]
             self.valset = datasets[2]
-            self.support_format = ["dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "validation", "all"]
-        elif self.name == "rond":
+        elif self.name == "ROND":
             datasets = getROND(self.path)
             self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
-        elif self.name == "chestxrays":
+        elif self.name == "ChestXRays":
             datasets = getChestXRays(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
-        elif self.name == "cheXpert_small":
-            datasets = getChestXRays(self.path)
+        elif self.name == "CheXpert_small":
+            datasets = getCheXpert_small(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
-        elif self.name == "cirrhosis":
+        elif self.name == "Cirrhosis":
             datasets = getCirrhosis(self.path)
             self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
-        elif self.name == "heartFailurePrediction":
+        elif self.name == "HeartFailurePrediction":
             datasets = getHeartFailurePrediction(self.path)
             self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
-        elif self.name == "hepatitisCPrediction":
+        elif self.name == "HepatitisCPrediction":
             datasets = getHepatitisCPrediction(self.path)
             self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
-        elif self.name == "ptb-xl":
+        elif self.name == "PTB_XL":
             datasets = getPTB_XL(self.path)
             self.trainset = datasets[0]
             self.testset = datasets[1]
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
-        elif self.name == "hoc":
+        elif self.name == "HoC":
             datasets = getHoC(self.path)
             self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
-        elif self.name == "strokePrediction":
+        elif self.name == "StrokePrediction":
             datasets = getStrokePrediction(self.path)
             self.alldata = datasets
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
         elif "IS_A" in self.name:
             subtitle = self.name.split("-")[-1]
             datasets = getIS_A(self.path, subtitle)
             self.trainset = datasets[0]
             self.testset = datasets[1]
-            self.support_format = ["df", "dict", "DeepPurpose"]
+            self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
         else:
-            raise ValueError(f"Dataset {self.name} is not supported.")
+            raise ValueError(f"Dataset {self.name} is not supported. Please select name in {SUPPORTED_DATASETS}.")
 
         if print_stats:
             self.print_stats()

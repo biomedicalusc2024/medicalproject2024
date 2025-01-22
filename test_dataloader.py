@@ -1,4 +1,4 @@
-from dataLoader.visualGrouping import DataLoader
+from dataLoader.classification import DataLoader
 
-dataloader = DataLoader(name="ChestX_ray8")
+dataloader = DataLoader(name="IS_A-easy")
 breakpoint()

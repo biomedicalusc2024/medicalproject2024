@@ -12,7 +12,7 @@ CORD19_SUBTITLE = ["metadata", "fulltext", "embeddings"]
 # tested by tjl 2025/1/17
 def getCORD19(path, subtitle):
     if subtitle not in CORD19_SUBTITLE:
-        raise AttributeError(f"please select subtitle in {CORD19_SUBTITLE}, enter name in format: CORD19-subtitle.")
+        raise AttributeError(f'Please enter dataset name in CORD19-subset format and select the subsection of CORD19 in {CORD19_SUBTITLE}')
     try:
         data_path = os.path.join(path, "CORD19")
         if os.path.exists(data_path):

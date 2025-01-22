@@ -134,7 +134,7 @@ def loadLocalFiles(path, subtitle):
     elif subtitle == "U":
         df = pd.read_json(os.path.join(path, "ori_PQAU.json")).T
     else:
-        raise AttributeError(f'Please enter dataset name in MedMnist-subset format and select the subsection of MedMnist in {PubMedQA_SUBTITLE}')
+        raise AttributeError(f'Please enter dataset name in PubMedQA-subset format and select the subsection of PubMedQA in {PubMedQA_SUBTITLE}')
     
     dataset = df.to_dict(orient='records')
     return dataset

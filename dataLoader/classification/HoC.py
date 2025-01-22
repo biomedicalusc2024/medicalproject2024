@@ -1,27 +1,24 @@
 import os
 import shutil
 import zipfile
-import requests
 import warnings
 import subprocess
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
 
 from ..utils import print_sys
 
 
+# tested by tjl 2025/1/22
 def getHoC(path):
-    url = "https://github.com/sb895/Hallmarks-of-Cancer/archive/refs/heads/master.zip"
-    return datasetLoad(url=url, path=path, datasetName="HoC")
+    urls = ["https://github.com/sb895/Hallmarks-of-Cancer/archive/refs/heads/master.zip"]
+    return datasetLoad(urls=urls, path=path, datasetName="HoC")
 
 
-def datasetLoad(url, path, datasetName):
+def datasetLoad(urls, path, datasetName):
     try:
         dataPath = os.path.join(path, datasetName)
-        get_source(url, dataPath)
+        get_source(urls[0], dataPath)
         return loadLocalFiles(dataPath)
     except Exception as e:
         print_sys(f"error: {e}")
@@ -33,10 +30,8 @@ def loadLocalFiles(path):
     id_list = os.listdir(sourcePath)
     source_list = [[os.path.join(sourcePath, s)] for s in id_list]
     target_list = [[os.path.join(targetPath, s)] for s in id_list]
-    return {
-        "source": source_list,
-        "target": target_list,
-    }
+    dataset = [{"text_path":text, "label_path":label} for text,label in zip(source_list,target_list)]
+    return dataset
 
 
 def get_source(source_url, target_path):

@@ -355,7 +355,7 @@ def loadLocalFiles(path, subtitle):
 
 def getROCO(path, subtitle):
     if subtitle not in ROCO_SUBTITLE:
-        raise AttributeError(f'Please enter dataset name in MedMnist-subset format and select the subsection of MedMnist in {ROCO_SUBTITLE}')
+        raise AttributeError(f'Please enter dataset name in ROCO-subset format and select the subsection of ROCO in {ROCO_SUBTITLE}')
     else:
         return fetch_and_extract(path, subtitle)
 
