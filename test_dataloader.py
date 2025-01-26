@@ -1,4 +1,6 @@
-from dataLoader.classification import DataLoader
+from dataLoader.segmentation import DataLoader
 
-dataloader = DataLoader(name="IS_A-easy")
+dataloader = DataLoader(name="BKAI_IGH")
+data = dataloader.get_data("df")
+print(data)
 breakpoint()

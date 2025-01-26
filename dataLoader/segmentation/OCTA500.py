@@ -9,8 +9,9 @@ warnings.filterwarnings("ignore")
 
 from ..utils import print_sys
 
+# need account and password, skipped
 
-def getOCTA(path):
+def getOCTA500(path):
     """
     Fetch OCTA Dataset, process, and return in the following format:
         rawdata (list): A list of all extracted file paths.

@@ -2,6 +2,8 @@ import os
 import requests
 from tqdm import tqdm
 
+# dataset not public, skipped
+
 def getNLST(path):
     """
     Fetch NLST files and save them locally.

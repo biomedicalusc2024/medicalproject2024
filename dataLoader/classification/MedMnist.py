@@ -36,6 +36,7 @@ def getMedMnist(path, sub=""):
         raise AttributeError(f"Please enter dataset name in MedMnist-subset format and select the subsection of MedMnist in {MedMnist_SUBTITLE}")
     return datasetLoad(urls=urls, path=path, sub=sub, datasetName="MedMnist")
 
+
 def datasetLoad(urls, path, sub, datasetName):
     try:
         datasetPath = os.path.join(path, datasetName)
@@ -49,6 +50,7 @@ def datasetLoad(urls, path, sub, datasetName):
             return loadLocalFiles(datasetFile)
     except Exception as e:
         print_sys(f"error: {e}")
+
 
 def loadLocalFiles(path):
     data = np.load(path)

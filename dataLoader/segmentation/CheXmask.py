@@ -1,16 +1,18 @@
 import os
+import zipfile
 import warnings
-import pandas as pd
+from tqdm import tqdm
+import requests
+from collections import defaultdict
 
 warnings.filterwarnings("ignore")
 
 from ..utils import print_sys, download_file
 
 
-# need to submit files to acquire permission, skipped
-def getBKAI_IGH(path):
-    urls = "bkai-igh-neopolyp"
-    return datasetLoad(urls=urls, path=path, datasetName="BKAI_IGH")
+def getCheXmask(path):
+    urls = ["https://physionet.org/static/published-projects/chexmask-cxr-segmentation-data/chexmask-database-a-large-scale-dataset-of-anatomical-segmentation-masks-for-chest-x-ray-images-0.1.zip"]
+    return datasetLoad(urls=urls, path=path, datasetName="CheXmask")
 
 
 def datasetLoad(urls, path, datasetName):

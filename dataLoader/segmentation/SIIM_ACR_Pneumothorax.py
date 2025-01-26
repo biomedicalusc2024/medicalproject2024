@@ -1,94 +1,58 @@
 import os
-import zipfile
-import subprocess
 import warnings
-from tqdm import tqdm
+import pandas as pd
 
 warnings.filterwarnings("ignore")
 
+from ..utils import print_sys, download_file
 
+
+# tested by tjl 2025/1/25
 def getSIIM_ACR(path):
-    """
-    Fetch SIIM-ACR Pneumothorax Segmentation Dataset, process, and return in the following format:
-        rawdata (list): A list of all extracted file paths.
-    """
-    dataset_slug = "vbookshelf/pneumothorax-chest-xray-images-and-masks"
-    rawdata = datasetLoad(dataset_slug=dataset_slug, path=path, datasetName="SIIM_ACR")
-
-    if not rawdata:
-        raise ValueError("Failed to fetch or process the SIIM-ACR Pneumothorax Segmentation Dataset.")
-
-    return rawdata
+    urls = ["https://www.kaggle.com/api/v1/datasets/download/vbookshelf/pneumothorax-chest-xray-images-and-masks"]
+    return datasetLoad(urls=urls, path=path, datasetName="SIIM_ACR")
 
 
-def datasetLoad(dataset_slug, path, datasetName):
-    """
-    Download and process the dataset if not already available locally.
-
-    Args:
-        dataset_slug (str): Kaggle dataset slug.
-        path (str): Base directory to store the dataset.
-        datasetName (str): Name of the dataset.
-
-    Returns:
-        rawdata (list): A list of all extracted file paths.
-    """
-    datasetPath = os.path.join(path, datasetName)
-    rawdata = []
-
+def datasetLoad(urls, path, datasetName):
     try:
+        datasetPath = os.path.join(path, datasetName)
+        zipPath = os.path.join(datasetPath,'raw.zip')
         if os.path.exists(datasetPath):
-            print("Found local copy...")
-            rawdata = loadLocalFiles(datasetPath)
+            print_sys("Found local copy...")
+            return loadLocalFiles(datasetPath)
         else:
-            print("Downloading SIIM-ACR Pneumothorax Segmentation Dataset...")
             os.makedirs(datasetPath, exist_ok=True)
-
-            # Use Kaggle CLI to download the dataset
-            kaggle_command = f"kaggle datasets download -d {dataset_slug} -p {datasetPath}"
-            subprocess.run(kaggle_command, shell=True, check=True)
-
-            # Identify the ZIP files in the datasetPath
-            zip_files = [f for f in os.listdir(datasetPath) if f.endswith(".zip")]
-            if not zip_files:
-                raise FileNotFoundError("No ZIP file found after download.")
-
-            # Extract all ZIP files found
-            for zip_file in zip_files:
-                zip_path = os.path.join(datasetPath, zip_file)
-                print(f"Extracting dataset from {zip_path}...")
-                with zipfile.ZipFile(zip_path, "r") as z:
-                    z.extractall(datasetPath)
-                os.remove(zip_path)
-            print("Extraction complete.")
-
-            rawdata = loadLocalFiles(datasetPath)
-
-    except subprocess.CalledProcessError as e:
-        print(f"Error during Kaggle CLI execution: {e}")
+            download_file(urls[0], zipPath, datasetPath)
+            return loadLocalFiles(datasetPath)
+        
     except Exception as e:
-        print(f"Error: {e}")
-
-    return rawdata
+        print_sys(f"error: {e}")
 
 
 def loadLocalFiles(path):
-    """
-    Process the local files into a flat list of file paths.
+    basePath = os.path.join(path, "siim-acr-pneumothorax")
+    train_df = pd.read_csv(os.path.join(basePath, "stage_1_train_images.csv"))
+    test_df = pd.read_csv(os.path.join(basePath, "stage_1_test_images.csv"))
+    
+    image_path = os.path.join(basePath, "png_images")
+    mask_path = os.path.join(basePath, "png_masks")
 
-    Args:
-        path (str): Path to the directory containing files.
+    images = os.listdir(image_path)
+    masks = os.listdir(mask_path)
 
-    Returns:
-        list: A list of all file paths.
-    """
-    rawdata = []
+    train_df = train_df[train_df["new_filename"].isin(images)]
+    test_df = test_df[test_df["new_filename"].isin(images)]
+    train_df = train_df[train_df["new_filename"].isin(masks)]
+    test_df = test_df[test_df["new_filename"].isin(masks)]
 
-    # Traverse all files in the directory
-    for root, _, files in os.walk(path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            rawdata.append(file_path)
+    train_df.rename(columns={'new_filename': 'image_path'}, inplace=True)
+    test_df.rename(columns={'new_filename': 'image_path'}, inplace=True)
 
-    print(f"Total files collected: {len(rawdata)}")
-    return rawdata
+    train_df["mask_path"] = train_df["image_path"].apply(lambda x: os.path.join(mask_path,x))
+    train_df["image_path"] = train_df["image_path"].apply(lambda x: os.path.join(image_path,x))
+    test_df["mask_path"] = test_df["image_path"].apply(lambda x: os.path.join(mask_path,x))
+    test_df["image_path"] = test_df["image_path"].apply(lambda x: os.path.join(image_path,x))
+
+    trainset = train_df.to_dict(orient='records')
+    testset = test_df.to_dict(orient='records')
+    return trainset, testset

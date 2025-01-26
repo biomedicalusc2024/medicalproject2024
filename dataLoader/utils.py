@@ -58,6 +58,11 @@ def download_file(url, destination, extractionPath=None):
                             tar.extractall(extractionPath)
                         print_sys("Extraction complete.")
                         os.remove(destination)
+                    elif "bz" in destination:
+                        with tarfile.open(destination, "r:bz2") as tar:
+                            tar.extractall(extractionPath)
+                        print_sys("Extraction complete.")
+                        os.remove(destination)
                     else:
                         with tarfile.open(destination, 'r') as tar:
                             tar.extractall(extractionPath)

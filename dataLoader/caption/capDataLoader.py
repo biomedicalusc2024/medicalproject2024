@@ -7,7 +7,8 @@ from .ROCO import getROCO, ROCO_SUBTITLE
 from .IUXray import getIUXray
 from .PMC_OA import getPMC_OA
 
-SUPPORTED_DATASETS = [f"ROCO-{sub}" for sub in ROCO_SUBTITLE] + ["IUXray", "PMC_OA"]
+SUPPORTED_DATASETS = [f"ROCO-{sub}" for sub in ROCO_SUBTITLE]
+SUPPORTED_DATASETS += ["IUXray", "PMC_OA"]
 
 class DataLoader(baseLoader.DataLoader):
     """

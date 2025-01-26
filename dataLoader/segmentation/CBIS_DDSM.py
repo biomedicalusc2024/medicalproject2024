@@ -1,94 +1,43 @@
 import os
-import zipfile
-import subprocess
 import warnings
-from tqdm import tqdm
+import pandas as pd
 
 warnings.filterwarnings("ignore")
 
+from ..utils import print_sys, download_file
 
+
+# tested by tjl 2025/1/25
 def getCBIS_DDSM(path):
-    """
-    Fetch CBIS-DDSM Pneumothorax Segmentation Dataset, process, and return in the following format:
-        rawdata (list): A list of all extracted file paths.
-    """
-    dataset_slug = "awsaf49/cbis-ddsm-breast-cancer-image-dataset"
-    rawdata = datasetLoad(dataset_slug=dataset_slug, path=path, datasetName="CBIS_DDSM")
-
-    if not rawdata:
-        raise ValueError("Failed to fetch or process the CBIS-DDSM Dataset.")
-
-    return rawdata
+    urls = ["https://www.kaggle.com/api/v1/datasets/download/awsaf49/cbis-ddsm-breast-cancer-image-dataset"]
+    return datasetLoad(urls=urls, path=path, datasetName="CBIS_DDSM")
 
 
-def datasetLoad(dataset_slug, path, datasetName):
-    """
-    Download and process the dataset if not already available locally.
-
-    Args:
-        dataset_slug (str): Kaggle dataset slug.
-        path (str): Base directory to store the dataset.
-        datasetName (str): Name of the dataset.
-
-    Returns:
-        rawdata (list): A list of all extracted file paths.
-    """
-    datasetPath = os.path.join(path, datasetName)
-    rawdata = []
-
+def datasetLoad(urls, path, datasetName):
     try:
+        datasetPath = os.path.join(path, datasetName)
+        zipPath = os.path.join(datasetPath,'raw.zip')
         if os.path.exists(datasetPath):
-            print("Found local copy...")
-            rawdata = loadLocalFiles(datasetPath)
+            print_sys("Found local copy...")
+            return loadLocalFiles(datasetPath)
         else:
-            print("Downloading SIIM-ACR Pneumothorax Segmentation Dataset...")
             os.makedirs(datasetPath, exist_ok=True)
-
-            # Use Kaggle CLI to download the dataset
-            kaggle_command = f"kaggle datasets download -d {dataset_slug} -p {datasetPath}"
-            subprocess.run(kaggle_command, shell=True, check=True)
-
-            # Identify the ZIP files in the datasetPath
-            zip_files = [f for f in os.listdir(datasetPath) if f.endswith(".zip")]
-            if not zip_files:
-                raise FileNotFoundError("No ZIP file found after download.")
-
-            # Extract all ZIP files found
-            for zip_file in zip_files:
-                zip_path = os.path.join(datasetPath, zip_file)
-                print(f"Extracting dataset from {zip_path}...")
-                with zipfile.ZipFile(zip_path, "r") as z:
-                    z.extractall(datasetPath)
-                os.remove(zip_path)
-            print("Extraction complete.")
-
-            rawdata = loadLocalFiles(datasetPath)
-
-    except subprocess.CalledProcessError as e:
-        print(f"Error during Kaggle CLI execution: {e}")
+            download_file(urls[0], zipPath, datasetPath)
+            return loadLocalFiles(datasetPath)
+        
     except Exception as e:
-        print(f"Error: {e}")
-
-    return rawdata
+        print_sys(f"error: {e}")
 
 
 def loadLocalFiles(path):
-    """
-    Process the local files into a flat list of file paths.
+    csvPath, jpegPath = os.path.join(path, "csv"), os.path.join(path, "jpeg")
+    # cal_train_df = pd.read_csv(os.path.join(csvPath, "calc_case_description_train_set.csv"))
+    # cal_test_df = pd.read_csv(os.path.join(csvPath, "calc_case_description_test_set.csv"))
+    # mass_train_df = pd.read_csv(os.path.join(csvPath, "mass_case_description_train_set.csv"))
+    # mass_test_df = pd.read_csv(os.path.join(csvPath, "mass_case_description_test_set.csv"))
+    dicom_df = pd.read_csv(os.path.join(csvPath, "dicom_info.csv"))
+    dicom_df["image_path"] = dicom_df["image_path"].apply(lambda x: x.replace('CBIS-DDSM/jpeg', jpegPath))
 
-    Args:
-        path (str): Path to the directory containing files.
-
-    Returns:
-        list: A list of all file paths.
-    """
-    rawdata = []
-
-    # Traverse all files in the directory
-    for root, _, files in os.walk(path):
-        for file in files:
-            file_path = os.path.join(root, file)
-            rawdata.append(file_path)
-
-    print(f"Total files collected: {len(rawdata)}")
-    return rawdata
+    dataset = dicom_df.to_dict(orient='records')
+    return dataset
+    
