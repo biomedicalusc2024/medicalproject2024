@@ -4,7 +4,6 @@ import rarfile
 import tarfile
 import zipfile
 import requests
-import numpy as np
 from tqdm import tqdm
 
 
@@ -68,6 +67,11 @@ def download_file(url, destination, extractionPath=None):
                             tar.extractall(extractionPath)
                         print_sys("Extraction complete.")
                         os.remove(destination)
+                elif "tgz" in destination:
+                    with tarfile.open(destination, 'r:gz') as tar:
+                        tar.extractall(extractionPath)
+                    print_sys("Extraction complete.")
+                    os.remove(destination)
 
         else:
             print_sys("url error")

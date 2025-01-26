@@ -1,6 +1,6 @@
-from dataLoader.segmentation import DataLoader
+from dataLoader.molecularGeneration import DataLoader
 
-dataloader = DataLoader(name="BKAI_IGH")
+dataloader = DataLoader(name="CrossDocked2020")
 data = dataloader.get_data("df")
 print(data)
 breakpoint()

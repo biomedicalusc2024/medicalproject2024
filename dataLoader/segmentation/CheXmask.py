@@ -1,9 +1,6 @@
 import os
-import zipfile
 import warnings
-from tqdm import tqdm
-import requests
-from collections import defaultdict
+import pandas as pd
 
 warnings.filterwarnings("ignore")
 

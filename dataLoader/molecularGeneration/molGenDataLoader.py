@@ -1,6 +1,3 @@
-import pandas as pd
-import numpy as np
-import os, sys, json
 import warnings
 
 warnings.filterwarnings("ignore")
@@ -40,9 +37,10 @@ class DataLoader(baseLoader.DataLoader):
             self.support_subset = ["train", "test", "all"]
         elif self.name == "CrossDocked2020":
             datasets = getCrossDocked2020(self.path)
-            self.alldata = datasets
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
             self.support_format = ["df", "DeepPurpose"]
-            self.support_subset = ["all"]
+            self.support_subset = ["train", "test", "all"]
         else:
             raise ValueError(f"Dataset {self.name} is not supported. Please select name in {SUPPORTED_DATASETS}.")
 
