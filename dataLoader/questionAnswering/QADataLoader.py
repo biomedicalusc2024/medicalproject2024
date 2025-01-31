@@ -8,9 +8,9 @@ from .VQA_RAD import getVQA_RAD
 from .PMC_VQA import getPMC_VQA
 from .MedMCQA import getMedMCQA
 from .MedQA_USMLE import getMedQA_USMLE, MedQA_USMLE_SUBTITLE
-from .LiveQA_PREC_2017 import getLiveQA_PREC_2017
+from .LiveQA_TREC_2017 import getLiveQA_TREC_2017
 from .MedicationQA import getMedicationQA
-from .CT_RATE import getCT_RATE
+# from .CT_RATE import getCT_RATE
 from .LLaVA_Med import getLLaVA_Med
 from .Path_VQA import getPath_VQA
 from .WSI_VQA import getWSI_VQA
@@ -79,13 +79,11 @@ class DataLoader(baseLoader.DataLoader):
             self.valset = datasets[2]
             self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "validation", "all"]
-        elif self.name == "LiveQA_PREC_2017":
-            datasets = getLiveQA_PREC_2017(self.path)
-            self.trainset = datasets[0]
-            self.testset = datasets[1]
-            self.valset = datasets[2]
+        elif self.name == "LiveQA_TREC_2017":
+            datasets = getLiveQA_TREC_2017(self.path)
+            self.alldata = datasets
             self.support_format = ["df", "DeepPurpose"]
-            self.support_subset = ["train", "test", "validation", "all"]
+            self.support_subset = ["all"]
         elif self.name == "MedicationQA":
             datasets = getMedicationQA(self.path)
             self.alldata = datasets

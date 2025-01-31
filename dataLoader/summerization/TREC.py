@@ -1,17 +1,14 @@
 import os
-import json
 import shutil
 import warnings
-import numpy as np
-import pandas as pd
-from tqdm import tqdm
 import xml.etree.ElementTree as ET
 
 warnings.filterwarnings("ignore")
 
-from ..utils import print_sys, download_file
+from ..utils import print_sys, download_file, xml_to_dict
 
 
+# tested by tjl 2025/1/30
 def getTREC(path):
     urls = [
         'https://www.trec-cds.org/2021_data/ClinicalTrials.2021-04-27.part1.zip',
@@ -48,4 +45,15 @@ def datasetLoad(urls, path, datasetName):
 
 
 def loadLocalFiles(path):
-    breakpoint()
+    subpaths = [os.path.join(path,sub) for sub in os.listdir(path)]
+    subpaths = [sub for sub in subpaths if os.path.isdir(sub)]
+
+    dataset = []
+    for subpath in subpaths:
+        for fn in os.listdir(subpath):
+            xml_path = os.path.join(subpath, fn)
+            tree = ET.parse(xml_path)
+            root = tree.getroot()
+            dataset.append(xml_to_dict(root))
+    
+    return dataset

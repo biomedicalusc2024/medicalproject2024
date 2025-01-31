@@ -1,22 +1,18 @@
 import os
 import shutil
-import zipfile
-import requests
 import warnings
-import subprocess
-import numpy as np
 import pandas as pd
-from tqdm import tqdm
+import xml.etree.ElementTree as ET
 
 warnings.filterwarnings("ignore")
 
-from ..utils import print_sys, download_file
+from ..utils import print_sys, download_file, xml_to_dict
 
 
-# need guidance on data needed
-def getLiveQA_PREC_2017(path):
+# tested by tjl 2025/1/30
+def getLiveQA_TREC_2017(path):
     urls = ["https://github.com/abachaa/LiveQA_MedicalTask_TREC2017/archive/refs/heads/master.zip"]
-    return datasetLoad(urls=urls, path=path, datasetName="LiveQA_PREC_2017")
+    return datasetLoad(urls=urls, path=path, datasetName="LiveQA_TREC_2017")
 
 
 def datasetLoad(urls, path, datasetName):
@@ -39,5 +35,9 @@ def datasetLoad(urls, path, datasetName):
 
 
 def loadLocalFiles(path):
-    breakpoint()
+    file_path = os.path.join(path, "TREC-2017-LiveQA-Medical-Test.xml")
+    tree = ET.parse(file_path)
+    root = tree.getroot()
+    dataset = xml_to_dict(root)
+    return dataset['NLM-QUESTION']
 

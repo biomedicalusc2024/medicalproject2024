@@ -29,4 +29,9 @@ def datasetLoad(urls, path, datasetName):
 
 
 def loadLocalFiles(path):
+    basePath = os.path.join(path, "chexmask-database-a-large-scale-dataset-of-anatomical-segmentation-masks-for-chest-x-ray-images-0.1")
+    originPath = os.path.join(basePath, "OriginalResolution")
+    preprocessedPath = os.path.join(basePath, "Preprocessed")
+    
+    df = pd.read_csv(os.path.join(originPath, "CheXpert.csv"))
     breakpoint()

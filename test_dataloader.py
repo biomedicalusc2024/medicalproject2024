@@ -1,6 +1,6 @@
-from dataLoader.molecularGeneration import DataLoader
+from dataLoader.summerization import DataLoader
 
-dataloader = DataLoader(name="CrossDocked2020")
+dataloader = DataLoader(name="TREC")
 data = dataloader.get_data("df")
 print(data)
 breakpoint()
