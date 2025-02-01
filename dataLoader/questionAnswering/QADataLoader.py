@@ -96,9 +96,10 @@ class DataLoader(baseLoader.DataLoader):
         #     self.support_subset = ["all"]
         elif self.name == "LLaVA_Med":
             datasets = getLLaVA_Med(self.path)
-            self.alldata = datasets
+            self.trainset = datasets[0]
+            self.testset = datasets[1]
             self.support_format = ["df", "DeepPurpose"]
-            self.support_subset = ["all"]
+            self.support_subset = ["train", "test", "all"]
         elif self.name == "Path_VQA":
             datasets = getPath_VQA(self.path)
             self.trainset = datasets[0]

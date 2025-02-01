@@ -1,7 +1,6 @@
 import os
 import shutil
 import warnings
-import pandas as pd
 import xml.etree.ElementTree as ET
 
 warnings.filterwarnings("ignore")

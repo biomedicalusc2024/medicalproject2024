@@ -2,6 +2,7 @@ import os
 import json
 import shutil
 import warnings
+import pandas as pd
 from tqdm import tqdm
 
 warnings.filterwarnings("ignore")
@@ -9,7 +10,7 @@ warnings.filterwarnings("ignore")
 from ..utils import print_sys, download_file
 
 
-# need guidance on data needed
+# tested by tjl 2025/1/31
 def getLLaVA_Med(path):
     urls = [
         'https://hanoverprod.z21.web.core.windows.net/med_llava/alignment/llava_med_alignment_500k.json',
@@ -70,4 +71,17 @@ def datasetLoad(urls, path, datasetName):
 
 
 def loadLocalFiles(path):
-    breakpoint()
+    align_path = os.path.join(path, "alignment", "llava_med_alignment_500k.json")
+    eval_path = os.path.join(path, "eval", "llava_med_eval_qa50_qa.jsonl")
+    images = os.listdir(os.path.join(path, "images"))
+
+    alignment_df = pd.read_json(align_path)
+    eval_df = pd.read_json(eval_path, lines=True)
+
+    alignment_df = alignment_df[alignment_df["image"].isin(images)]
+    eval_df = eval_df[eval_df["image"].isin(images)]
+
+    trainset = alignment_df.to_dict(orient="records")
+    testset = eval_df.to_dict(orient="records")
+
+    return trainset, testset

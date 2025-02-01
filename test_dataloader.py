@@ -1,6 +1,6 @@
-from dataLoader.summerization import DataLoader
+from dataLoader.questionAnswering import DataLoader
 
-dataloader = DataLoader(name="TREC")
+dataloader = DataLoader(name="LLaVA_Med")
 data = dataloader.get_data("df")
 print(data)
 breakpoint()
