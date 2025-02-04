@@ -1,6 +1,6 @@
-from dataLoader.questionAnswering import DataLoader
+from dataLoader.segmentation import DataLoader
 
-dataloader = DataLoader(name="LLaVA_Med")
+dataloader = DataLoader(name="CheXmask")
 data = dataloader.get_data("df")
 print(data)
 breakpoint()
