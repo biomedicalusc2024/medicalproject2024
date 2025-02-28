@@ -1,5 +1,6 @@
 import os
 import pickle
+from subprocess import check_output
 
 from .qa_dedup_util import (
     load_dataset,
@@ -29,7 +30,10 @@ def load_model(model_name):
     
     # maybe add other models here later. Or we provide download links for the models.
     if model_name == "MedImageInsight":
-        from .MedImageInsights.medimageinsightmodel import MedImageInsight
+        if "MedImageInsight" not in os.listdir(""):
+            check_output(["git", "clone", "https://huggingface.co/lion-ai/MedImageInsights"])
+            
+        from MedImageInsights.medimageinsightmodel import MedImageInsight
 
         model = MedImageInsight(
             model_dir=f"{os.path.dirname(__file__)}/MedImageInsights/2024.09.27",
