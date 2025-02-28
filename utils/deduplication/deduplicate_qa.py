@@ -39,7 +39,6 @@ def load_model(model_name):
         model.load_model()
         return model
 
-    
 
 def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, threshold):
     """Process a single dataset through deduplication pipeline"""
@@ -49,7 +48,7 @@ def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, thr
         ds = load_dataset(dataset_name, data_dir)
         
         # Within dataset deduplication
-        deduplicated_data, _ = deduplication_within_dataset_qa(ds, model, threshold)
+        deduplicated_data, _, _ = deduplication_within_dataset_qa(ds, model, threshold)
         
         # load old_embeddings
         old_answer_embeddings = []
@@ -62,7 +61,7 @@ def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, thr
                     old_question_embeddings.append(pickle.load(open(os.path.join(embeddings_dir, file), "rb")))
         
         # Between dataset deduplication
-        deduplicated_data, _ = deduplicate_across_datasets_qa(deduplicated_data, old_question_embeddings, old_answer_embeddings, model, threshold)
+        deduplicated_data, _, _ = deduplicate_across_datasets_qa(deduplicated_data, old_question_embeddings, old_answer_embeddings, model, threshold)
         
         # Save deduplicated data
         save_path = os.path.join(save_dir, f"{dataset_name}_deduplicated.csv")
@@ -82,8 +81,8 @@ def deduplicate_qa(datasets, data_dir, save_dir, model_name="MedImageInsight", t
     datasets(List(Str)): which datasets to load
     '''
     # Download/verify model
-    # model = load_model(model_name)
-    model = None
+    model = load_model(model_name)
+    # model = None
     
     # Create save directory
     qa_save_dir = os.path.join(save_dir, "deduplicate_qa")
@@ -107,7 +106,7 @@ def deduplicate_qa(datasets, data_dir, save_dir, model_name="MedImageInsight", t
             success = process_dataset(
                 dataset,
                 data_dir,
-                save_dir,
+                qa_save_dir,
                 embeddings_dir,
                 model,
                 threshold

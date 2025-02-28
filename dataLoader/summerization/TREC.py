@@ -5,7 +5,7 @@ import xml.etree.ElementTree as ET
 
 warnings.filterwarnings("ignore")
 
-from ..utils import print_sys, download_file, xml_to_dict
+from ..utils import print_sys, download_file
 
 
 # tested by tjl 2025/1/30
@@ -57,3 +57,19 @@ def loadLocalFiles(path):
             dataset.append(xml_to_dict(root))
     
     return dataset
+
+
+def xml_to_dict(element):
+    if len(element) == 0:
+        return element.text
+    result = {}
+    for child in element:
+        child_data = xml_to_dict(child)
+        if child.tag in result:
+            if isinstance(result[child.tag], list):
+                result[child.tag].append(child_data)
+            else:
+                result[child.tag] = [result[child.tag], child_data]
+        else:
+            result[child.tag] = child_data
+    return result

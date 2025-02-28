@@ -3,45 +3,110 @@
 
 # imports
 import os
-import json
+import torch
 import pickle
 import numpy as np
 import pandas as pd
 from tqdm import tqdm
-import xml.etree.ElementTree as ET
 from sklearn.metrics.pairwise import cosine_similarity
 
 # Dataset Loading
-# loading dataset
-def parse_xml(file):
-    """
-    Parse the xml file into a pandas dataframe.
-    """
-    tree = ET.parse(file)
-    root = tree.getroot()
-
-    sentence_data = []
-    for sentence in root.findall('sentence'):
-        sentence_id = sentence.get('id')
-        sentence_text = sentence.get('text')
-
-        sentence_data.append({
-            "sentence_id": sentence_id,
-            "sentence_text": sentence_text
-        })
-
-    return pd.DataFrame(sentence_data)
-
-
 def load_dataset(dataset_name, data_dir):
     """
     Load the dataset from the given path. 
     """
     if dataset_name == "LiveQA":
         from ...dataLoader.questionAnswering.LiveQA_TREC_2017 import getLiveQA_TREC_2017
-        ds = getLiveQA_TREC_2017(data_dir)
-    breakpoint()
+        def reform_LiveQA(ds):
+            reformed = []
+            columns = [
+                'NIST_PARAPHRASE', 'NLM_SUMMARY', 'QUESTION_ID', 
+                'ORIGINAL_QUESTION_SUBJECT', 'ORIGINAL_QUESTION_FILE', 
+                'ANNOTATIONS_FOCUS', 'ANNOTATIONS_TYPE', 'ANNOTATIONS_KEYWORD'
+            ]
+            for entity in ds:
+                new_entity = {q:entity[q] for q in columns}
+                new_entity["question"] = entity["ORIGINAL_QUESTION_MESSAGE"]
+                new_entity["answer"] = [a["ANSWER"] for a in entity["REFERENCE_ANSWERS"]]
+                reformed.append(new_entity)
+            df = pd.DataFrame(reformed)
+            df["question"] = df["question"].fillna("").astype(str)
+            df["answer"] = df["answer"].fillna("").astype(str)
+            df = df[(df["question"].str.strip() != "") & (df["answer"].str.strip() != "")]
+            return df.reset_index(drop=True)
+        
+        ds_raw = getLiveQA_TREC_2017(data_dir)
+        ds = reform_LiveQA(ds_raw)
+        
+    elif dataset_name == "MedicationQA":
+        from ...dataLoader.questionAnswering.MedicationQA import getMedicationQA
+        def reform_MedicationQA(ds):
+            ds = pd.DataFrame(ds)
+            ds = ds.rename(columns={"Question": "question", "Answer": "answer"})
+            ds = ds.dropna(subset = ["question", "answer"])
+            return ds
 
+        ds_raw = getMedicationQA(data_dir)
+        ds = reform_MedicationQA(ds_raw)
+
+    elif dataset_name == "MedMCQA":
+        from ...dataLoader.questionAnswering.MedMCQA import getMedMCQA
+        def reform_MedMCQA(ds):
+            ds = ds[0] + ds[1] + ds[2]
+            reformed = []
+            for entity in ds:
+                new_entity = entity
+                opa = entity.get("opa")
+                opb = entity.get("opb")
+                opc = entity.get("opc")
+                opd = entity.get("opd")
+                cop = entity.get("cop")
+                exp = entity.get("exp")
+                new_entity["answer"] = f"The choices are: A) {opa}, B) {opb}, C) {opc}, D) {opd}. The correct answer is {cop}, because {exp}"
+                reformed.append(new_entity)
+            reformed = pd.DataFrame(reformed)
+            reformed = reformed.dropna(subset = ["question", "answer"])
+            return reformed
+        
+        ds_raw = getMedMCQA(data_dir)
+        ds = reform_MedMCQA(ds_raw)
+
+    elif dataset_name == "MedQA-USMLE":
+        from ...dataLoader.questionAnswering.MedQA_USMLE import getMedQA_USMLE
+        def reform_MedQA_USMLE(ds):
+            ds = ds[0] + ds[1] + ds[2]
+            reformed = []
+            for entity in ds:
+                options = entity["options"]
+                answer = entity["answer"]
+                new_entity = {
+                    "question": entity["question"],
+                    "options": entity["options"],
+                    "old_answer": entity["answer"],
+                    "meta_info": entity["meta_info"],
+                    "answer_idx": entity["answer_idx"],
+                    "answer": f"The options you have are {options}. The correct answer is {answer}."
+                }
+                reformed.append(new_entity)
+            reformed = pd.DataFrame(reformed)
+            reformed = reformed.dropna(subset = ["question", "answer"])
+            return reformed
+
+        ds_raw = getMedQA_USMLE(data_dir, "all")
+        ds = reform_MedQA_USMLE(ds_raw)
+
+    elif dataset_name == "PubMedQA":
+        from ...dataLoader.questionAnswering.PubMedQA import getPubMedQA
+        def reform_PubMedQA(ds):
+            ds = pd.DataFrame(ds)
+            ds = ds.rename(columns={"QUESTION": "question", "LONG_ANSWER": "answer"})
+            ds = ds.dropna(subset = ["question", "answer"])
+            return ds
+        
+        ds_raw = getPubMedQA(data_dir, "all")
+        ds = reform_PubMedQA(ds_raw)
+    
+    return ds
 
 
 def get_embeddings(texts, model, batch_size = 64):
@@ -49,10 +114,12 @@ def get_embeddings(texts, model, batch_size = 64):
     Get the embeddings for the given texts. Use batch processing to speed up the process.
     """
     embeddings = []
-    for i in tqdm(range(0, len(texts), batch_size), desc = "Generating embeddings"):
-        batch_texts = texts[i:i+batch_size]
-        embeddings.extend(model.encode(texts = batch_texts)['text_embeddings'])
+    with torch.no_grad():
+        for i in tqdm(range(0, len(texts), batch_size), desc = "Generating embeddings"):
+            batch_texts = texts[i:i+batch_size]
+            embeddings.extend(model.encode(texts = batch_texts)['text_embeddings'])
     return np.array(embeddings)
+
 
 def compute_similarity_chunked(embeddings, threshold=0.9, chunk_size=8000):
     """
@@ -80,6 +147,7 @@ def compute_similarity_chunked(embeddings, threshold=0.9, chunk_size=8000):
             to_remove.update(similar_indices)
 
     return to_remove
+
 
 def compute_similarity_between_datasets_chunked(embeddings1, embeddings2, threshold=0.9, chunk_size1=8000, chunk_size2=8000):
     """
@@ -111,6 +179,7 @@ def compute_similarity_between_datasets_chunked(embeddings1, embeddings2, thresh
 
     return to_remove
 
+
 def deduplication_within_dataset_qa(dataset, model, threshold = 0.9):
     """
     Given the dataset, deduplicate the dataset within itself.
@@ -129,6 +198,7 @@ def deduplication_within_dataset_qa(dataset, model, threshold = 0.9):
 
     new_dataset = new_dataset.drop(index = list(to_remove_answers)).reset_index(drop=True)
     return new_dataset, list(to_remove_questions), list(to_remove_answers)
+
 
 def deduplicate_across_datasets_qa(new_dataset, old_question_embeddings_saved, old_answer_embeddings_saved, model, threshold = 0.9):
     """
@@ -160,11 +230,8 @@ def deduplicate_across_datasets_qa(new_dataset, old_question_embeddings_saved, o
 
     return deduplicated_new_dataset, list(to_remove_questions), list(to_remove_answers)
 
-## Calculate Existing Embeddings
-import os
-import numpy as np
-import pickle  # To save/load embeddings efficiently
 
+## Calculate Existing Embeddings
 def calculate_and_save_embeddings(dataset, dataset_name, model, save_dir="embeddings_cache", batch_size=128):
     """
     Compute and save embeddings for a QA dataset.
@@ -193,32 +260,33 @@ def calculate_and_save_embeddings(dataset, dataset_name, model, save_dir="embedd
         with open(answer_embedding_file, "rb") as af:
             answer_embeddings = pickle.load(af)
     else:
-        # Compute embeddings for questions
-        print(f"Generating question embeddings for {dataset_name}...")
-        questions = dataset["question"].tolist()
-        question_embeddings = []
-        for i in tqdm(range(0, len(questions), batch_size), desc="Question Embeddings"):
-            batch_questions = questions[i:i + batch_size]
-            question_embeddings.extend(model.encode(texts=batch_questions)["text_embeddings"])
-        question_embeddings = np.array(question_embeddings)
+        with torch.no_grad():
+            # Compute embeddings for questions
+            print(f"Generating question embeddings for {dataset_name}...")
+            questions = dataset["question"].tolist()
+            question_embeddings = []
+            for i in tqdm(range(0, len(questions), batch_size), desc="Question Embeddings"):
+                batch_questions = questions[i:i + batch_size]
+                question_embeddings.extend(model.encode(texts=batch_questions)["text_embeddings"])
+            question_embeddings = np.array(question_embeddings)
 
-        # Save question embeddings
-        with open(question_embedding_file, "wb") as qf:
-            pickle.dump(question_embeddings, qf)
-        print(f"Saved question embeddings for {dataset_name}.")
+            # Save question embeddings
+            with open(question_embedding_file, "wb") as qf:
+                pickle.dump(question_embeddings, qf)
+            print(f"Saved question embeddings for {dataset_name}.")
 
-        # Compute embeddings for answers
-        print(f"Generating answer embeddings for {dataset_name}...")
-        answers = dataset["answer"].tolist()
-        answer_embeddings = []
-        for i in tqdm(range(0, len(answers), batch_size), desc="Answer Embeddings"):
-            batch_answers = answers[i:i + batch_size]
-            answer_embeddings.extend(model.encode(texts=batch_answers)["text_embeddings"])
-        answer_embeddings = np.array(answer_embeddings)
+            # Compute embeddings for answers
+            print(f"Generating answer embeddings for {dataset_name}...")
+            answers = dataset["answer"].tolist()
+            answer_embeddings = []
+            for i in tqdm(range(0, len(answers), batch_size), desc="Answer Embeddings"):
+                batch_answers = answers[i:i + batch_size]
+                answer_embeddings.extend(model.encode(texts=batch_answers)["text_embeddings"])
+            answer_embeddings = np.array(answer_embeddings)
 
-        # Save answer embeddings
-        with open(answer_embedding_file, "wb") as af:
-            pickle.dump(answer_embeddings, af)
-        print(f"Saved answer embeddings for {dataset_name}.")
+            # Save answer embeddings
+            with open(answer_embedding_file, "wb") as af:
+                pickle.dump(answer_embeddings, af)
+            print(f"Saved answer embeddings for {dataset_name}.")
 
     return {"questions": question_embeddings, "answers": answer_embeddings}

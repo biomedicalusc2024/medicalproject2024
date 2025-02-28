@@ -6,7 +6,7 @@ warnings.filterwarnings("ignore")
 
 from ..utils import print_sys, download_file
 
-MedQA_USMLE_SUBTITLE = ["Mainland", "Taiwan", "US"]
+MedQA_USMLE_SUBTITLE = ["Mainland", "Taiwan", "US", "all"]
 
 
 # tested by tjl 2025/1/19
@@ -37,6 +37,20 @@ def loadLocalFiles(path, subtitle):
         basePath = os.path.join(basePath, "Taiwan")
     elif subtitle == "US":
         basePath = os.path.join(basePath, "US")
+    elif subtitle == "all":
+        trainset, testset, valset = [], [], []
+        for sub_path in ["Mainland", "Taiwan", "US"]:
+            subPath = os.path.join(basePath, sub_path)
+            df_train = pd.read_json(os.path.join(subPath, "train.jsonl"), lines=True)
+            df_test = pd.read_json(os.path.join(subPath, "test.jsonl"), lines=True)
+            df_val = pd.read_json(os.path.join(subPath, "dev.jsonl"), lines=True)
+
+
+            trainset = trainset + df_train.to_dict(orient='records')
+            testset = testset + df_test.to_dict(orient='records')
+            valset = valset + df_val.to_dict(orient='records')
+            
+        return trainset, testset, valset
     else:
         raise AttributeError(f'Please enter dataset name in MedQA_USMLE-subset format and select the subsection of MedQA_USMLE in {MedQA_USMLE_SUBTITLE}')
     

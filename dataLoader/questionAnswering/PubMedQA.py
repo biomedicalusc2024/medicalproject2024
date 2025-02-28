@@ -11,7 +11,7 @@ warnings.filterwarnings("ignore")
 
 from ..utils import print_sys, download_file
 
-PubMedQA_SUBTITLE = ["A", "U", "L"]
+PubMedQA_SUBTITLE = ["A", "U", "L", "all"]
 
 
 # tested by tjl 2025/1/19
@@ -133,6 +133,12 @@ def loadLocalFiles(path, subtitle):
         df = pd.read_json(os.path.join(path, "ori_PQAL.json")).T
     elif subtitle == "U":
         df = pd.read_json(os.path.join(path, "ori_PQAU.json")).T
+    elif subtitle == "all":
+        dataset = []
+        for sub in ["A", "L", "U"]:
+            df = pd.read_json(os.path.join(path, f"ori_PQA{sub}.json")).T
+            dataset += df.to_dict(orient='records')
+        return dataset
     else:
         raise AttributeError(f'Please enter dataset name in PubMedQA-subset format and select the subsection of PubMedQA in {PubMedQA_SUBTITLE}')
     
