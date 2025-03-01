@@ -44,6 +44,7 @@ def load_dataset(dataset_name, data_dir):
             ds = pd.DataFrame(ds)
             ds = ds.rename(columns={"Question": "question", "Answer": "answer"})
             ds = ds.dropna(subset = ["question", "answer"])
+            ds = ds.reset_index(drop= True)
             return ds
 
         ds_raw = getMedicationQA(data_dir)
@@ -66,6 +67,7 @@ def load_dataset(dataset_name, data_dir):
                 reformed.append(new_entity)
             reformed = pd.DataFrame(reformed)
             reformed = reformed.dropna(subset = ["question", "answer"])
+            reformed = reformed.reset_index(drop= True)
             return reformed
         
         ds_raw = getMedMCQA(data_dir)
@@ -90,6 +92,7 @@ def load_dataset(dataset_name, data_dir):
                 reformed.append(new_entity)
             reformed = pd.DataFrame(reformed)
             reformed = reformed.dropna(subset = ["question", "answer"])
+            reformed = reformed.reset_index(drop= True)
             return reformed
 
         ds_raw = getMedQA_USMLE(data_dir, "all")
@@ -101,6 +104,7 @@ def load_dataset(dataset_name, data_dir):
             ds = pd.DataFrame(ds)
             ds = ds.rename(columns={"QUESTION": "question", "LONG_ANSWER": "answer"})
             ds = ds.dropna(subset = ["question", "answer"])
+            ds = ds.reset_index(drop= True)
             return ds
         
         ds_raw = getPubMedQA(data_dir, "all")

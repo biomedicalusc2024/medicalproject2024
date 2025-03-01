@@ -14,7 +14,7 @@ def getCORD19(path, subtitle):
     if subtitle not in CORD19_SUBTITLE:
         raise AttributeError(f'Please enter dataset name in CORD19-subset format and select the subsection of CORD19 in {CORD19_SUBTITLE}')
     try:
-        data_path = os.path.join(path, "CORD19")
+        data_path = os.path.join(path, "CORD19", subtitle)
         if os.path.exists(data_path):
             ds = datasets.load_from_disk(data_path)
         else:

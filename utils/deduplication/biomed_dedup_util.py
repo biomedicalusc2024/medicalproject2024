@@ -1,94 +1,69 @@
 # Same loading data, but here we have some different functions to deduplicate the dataset. 
-import pandas as pd
 import os
-from transformers import AutoTokenizer, AutoModel
 import torch
-from sklearn.metrics.pairwise import cosine_similarity
-import numpy as np
-import xml.etree.ElementTree as ET
-import json
-from tqdm import tqdm
 import pickle
+import numpy as np
+import pandas as pd
+from tqdm import tqdm
+from sklearn.metrics.pairwise import cosine_similarity
 
 # Dataset Loading
-def parse_xml(file):
-    """
-    Parse the xml file into a pandas dataframe.
-    """
-    tree = ET.parse(file)
-    root = tree.getroot()
-
-    sentence_data = []
-    for sentence in root.findall('sentence'):
-        sentence_id = sentence.get('id')
-        sentence_text = sentence.get('text')
-
-        sentence_data.append({
-            "sentence_id": sentence_id,
-            "sentence_text": sentence_text
-        })
-
-    return pd.DataFrame(sentence_data)
-
-
-def load_dataset(path, filetype = "csv"):
+def load_dataset(dataset_name, data_dir):
     """
     Load the dataset from the given path. It returns a dictionary with the file path as the key and the dataframe as the value for any file that is the given filetype in the given path.
     """
-    if filetype == "csv":
-        all_files = []
-        for root, dirs, files in tqdm(os.walk(path), desc = "Loading CSV files"):
-            for file in tqdm(files, desc = "Processing file"):
-                if file.endswith(".csv"):
-                    all_files.append(os.path.join(root, file))
-        ds = {}
-        for f in all_files:
-            df = pd.read_csv(f)
-            ds[f] = df
-        return ds
-    elif filetype == "xml":
-        all_files = []
-        for root, dirs, files in tqdm(os.walk(path), desc = "Loading XML files"):
-            for file in tqdm(files, desc = "Processing file"):
-                if file.endswith(".xml"):
-                    all_files.append(os.path.join(root, file))
-        ds = {}
-        for f in all_files:
-            ds[f] = parse_xml(f)
-        return ds
-    elif filetype == "jsonl":
-        all_files = []
-        for root, dirs, files in tqdm(os.walk(path), desc = "Loading JSONL files"):
-            for file in tqdm(files, desc = "Processing file"):
-                if file.endswith(".jsonl"):
-                    all_files.append(os.path.join(root, file))
-        ds = {}
-        for f in all_files:
-            print("current file: ", f)
-            with open(f, "r") as file:
-                data = [json.loads(line) for line in file]
-            ds[f] = pd.DataFrame(data)
-        return ds
-    elif filetype == "json":
-        all_files = []
-        for root, dirs, files in tqdm(os.walk(path), desc = "Loading JSON files"):
-            for file in tqdm(files, desc = "Processing file"):
-                if file.endswith(".json"):
-                    all_files.append(os.path.join(root, file))
-        ds = {}
-        for f in all_files:
-            with open(f, "r") as file:
-                data = json.load(file)
-            ds[f] = pd.DataFrame(data)
-        return ds
+    if dataset_name == "bc5cdr":
+        from ...dataLoader.relationExtraction.BC5CDR import getBC5CDR
+        def reform_BC5CDR(ds):
+            reformed = []
+            for entity in ds:
+                passage = entity["passages"]
+                new_entity = {
+                    "document_id": passage[0]["document_id"],
+                    "text": passage[0]["text"] + " " + passage[1]["text"],
+                    "relations": passage[0]["relations"],
+                }
+                reformed.append(new_entity)
+            return pd.DataFrame(reformed)
 
-# deduplicate the dataset
+        ds_raw = getBC5CDR(data_dir)
+        ds = reform_BC5CDR(ds_raw[0]+ds_raw[1]+ds_raw[2])
+
+    elif dataset_name == "BioNLI":
+        from ...dataLoader.inference.BioNLI import getBioNLI
+
+        ds_raw = getBioNLI(data_dir)
+        ds = pd.DataFrame(ds_raw[0]+ds_raw[1]+ds_raw[2])
+
+    elif dataset_name == "CORD19":
+        from ...dataLoader.database.CORD19 import getCORD19
+
+        ds_raw = getCORD19(data_dir, "fulltext")
+        ds = pd.DataFrame(ds_raw)
+        
+    elif dataset_name == "hoc":
+        from ...dataLoader.classification.HoC import getHoC
+
+        ds_raw = getHoC(data_dir)
+        ds = pd.DataFrame(ds_raw)
+        
+    elif dataset_name == "SourceData":
+        from ...dataLoader.namedEntityRecognition.SourceData import getSourceData
+
+        ds_raw = getSourceData(data_dir)
+        ds = pd.DataFrame(ds_raw[0]+ds_raw[1]+ds_raw[2])
+        
+    return ds
+
+
 def get_embeddings(texts, model, batch_size = 64):
     embeddings = []
-    for i in tqdm(range(0, len(texts), batch_size), desc = "Generating embeddings"):
-        batch_texts = texts[i:i+batch_size]
-        embeddings.extend(model.encode(texts = batch_texts)['text_embeddings'])
+    with torch.no_grad():
+        for i in tqdm(range(0, len(texts), batch_size), desc = "Generating embeddings"):
+            batch_texts = texts[i:i+batch_size]
+            embeddings.extend(model.encode(texts = batch_texts)['text_embeddings'])
     return np.array(embeddings)
+
 
 def compute_similarity_chunked(embeddings, threshold=0.9, chunk_size=8000):
     """
@@ -114,6 +89,7 @@ def compute_similarity_chunked(embeddings, threshold=0.9, chunk_size=8000):
             to_remove.update(similar_indices)
 
     return to_remove
+
 
 def compute_similarity_between_datasets_chunked(embeddings1, embeddings2, threshold=0.9, chunk_size1=8000, chunk_size2=8000):
     """
@@ -144,13 +120,17 @@ def compute_similarity_between_datasets_chunked(embeddings1, embeddings2, thresh
 
     return to_remove
 
+
 def deduplicate_within_dataset(dataset, columns, model, threshold=0.9):
     # joins the columns in the dataset
     texts = list(dataset[columns].apply(lambda x: " ".join(x.values.astype(str)), axis=1))
     embeddings = get_embeddings(texts, model)
     to_remove = compute_similarity_chunked(embeddings, threshold=threshold)
     number_removed = len(to_remove)
-    return dataset.drop(to_remove), number_removed
+    droped_dataset = dataset.drop(to_remove)
+    droped_dataset = droped_dataset.reset_index(drop= True)
+    return droped_dataset, number_removed
+
 
 def deduplicate_between_datasets(new_dataset, columns, model, old_embeddings, threshold=0.9):
     texts1 = list(new_dataset[columns].apply(lambda x: " ".join(x.values.astype(str)), axis=1))
@@ -160,9 +140,12 @@ def deduplicate_between_datasets(new_dataset, columns, model, old_embeddings, th
         old_embeddings_list.extend(embed)
     to_remove = compute_similarity_between_datasets_chunked(embeddings1, old_embeddings_list, threshold=threshold)
     number_removed = len(to_remove)
-    return new_dataset.drop(to_remove), number_removed
+    droped_dataset = new_dataset.drop(to_remove)
+    droped_dataset = droped_dataset.reset_index(drop= True)
+    return droped_dataset, number_removed
 
-def calculate_and_save_embeddings(dataset, dataset_name, model, save_dir="embeddings_cache", batch_size=128):
+
+def calculate_and_save_embeddings(dataset, dataset_name, model, column_names, save_dir="embeddings_cache", batch_size=128):
     """
     Compute and save embeddings for a QA dataset.
 
@@ -176,46 +159,31 @@ def calculate_and_save_embeddings(dataset, dataset_name, model, save_dir="embedd
         dict: A dictionary containing question and answer embeddings.
     """
     # Ensure save directory exists
-    if not os.path.exists(save_dir):
-        os.makedirs(save_dir)
+    os.makedirs(save_dir, exist_ok=True)
     # File paths for embeddings
-    question_embedding_file = os.path.join(save_dir, f"{dataset_name}_question_embeddings.pkl")
-    answer_embedding_file = os.path.join(save_dir, f"{dataset_name}_answer_embeddings.pkl")
+    embedding_file = os.path.join(save_dir, f"{dataset_name}_embeddings.pkl")
 
     # Check if embeddings already exist
-    if os.path.exists(question_embedding_file) and os.path.exists(answer_embedding_file):
+    if os.path.exists(embedding_file):
         print(f"Loading cached embeddings for {dataset_name}...")
-        with open(question_embedding_file, "rb") as qf:
-            question_embeddings = pickle.load(qf)
-        with open(answer_embedding_file, "rb") as af:
-            answer_embeddings = pickle.load(af)
+        with open(embedding_file, "rb") as qf:
+            embeddings = pickle.load(qf)
     else:
-        # Compute embeddings for questions
-        print(f"Generating question embeddings for {dataset_name}...")
-        questions = dataset["question"].tolist()
-        question_embeddings = []
-        for i in tqdm(range(0, len(questions), batch_size), desc="Question Embeddings"):
-            batch_questions = questions[i:i + batch_size]
-            question_embeddings.extend(model.encode(texts=batch_questions)["text_embeddings"])
-        question_embeddings = np.array(question_embeddings)
+        with torch.no_grad():
+            print(f"Generating embeddings for {dataset_name}...")
+            if column_names == "all":
+                texts = [' '.join(str(element) for element in row) for row in dataset.values] 
+            else:
+                texts = [' '.join(str(element) for element in row) for row in dataset[column_names].values] 
+            embeddings = []
+            for i in tqdm(range(0, len(texts), batch_size), desc="Text Embeddings"):
+                batch_texts = texts[i:i + batch_size]
+                embeddings.extend(model.encode(texts=batch_texts)["text_embeddings"])
+            embeddings = np.array(embeddings)
 
-        # Save question embeddings
-        with open(question_embedding_file, "wb") as qf:
-            pickle.dump(question_embeddings, qf)
-        print(f"Saved question embeddings for {dataset_name}.")
+            # Save question embeddings
+            with open(embedding_file, "wb") as qf:
+                pickle.dump(embeddings, qf)
+            print(f"Saved embeddings for {dataset_name}.")
 
-        # Compute embeddings for answers
-        print(f"Generating answer embeddings for {dataset_name}...")
-        answers = dataset["answer"].tolist()
-        answer_embeddings = []
-        for i in tqdm(range(0, len(answers), batch_size), desc="Answer Embeddings"):
-            batch_answers = answers[i:i + batch_size]
-            answer_embeddings.extend(model.encode(texts=batch_answers)["text_embeddings"])
-        answer_embeddings = np.array(answer_embeddings)
-
-        # Save answer embeddings
-        with open(answer_embedding_file, "wb") as af:
-            pickle.dump(answer_embeddings, af)
-        print(f"Saved answer embeddings for {dataset_name}.")
-
-    return {"questions": question_embeddings, "answers": answer_embeddings}
+        return embeddings

@@ -1,6 +1,7 @@
 import os
 import pickle
 import pandas as pd
+from subprocess import check_output
 
 from .biomed_dedup_util import (
     load_dataset, 
@@ -14,11 +15,11 @@ AVAILABLE_DATASETS = [
     "bc5cdr",
     "BioNLI",
     "CORD19",
-    "DDCICorpus",
+    # "DDCICorpus",
     "hoc",
-    "pubmed", 
+    # "pubmed", 
     "SourceData",
-    "trec_covid",
+    # "trec_covid",
 ]
 
 # all the available models, maybe can expand later.
@@ -33,10 +34,17 @@ def load_model(model_name):
     
     # maybe add other models here later. Or we provide download links for the models.
     if model_name == "MedImageInsight":
+        dir_path = os.path.dirname(__file__)
+        if "MedImageInsights" not in os.listdir(dir_path):
+            check_output(["git", "clone", "https://huggingface.co/lion-ai/MedImageInsights", f"{dir_path}/MedImageInsights"])
+
+        import sys
+        sys.path.append(f"{dir_path}/MedImageInsights")
         from .MedImageInsights.medimageinsightmodel import MedImageInsight
 
         model = MedImageInsight(
             model_dir=f"{os.path.dirname(__file__)}/MedImageInsights/2024.09.27",
+            # model_dir="MedImageInsights/2024.09.27",
             vision_model_name="medimageinsigt-v1.0.0.pt",
             language_model_name="language_model.pth"
         )
@@ -50,34 +58,29 @@ def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, thr
     
     try:
         # Load dataset
-        ds = load_dataset(os.path.join(data_dir, dataset_name))
+        ds = load_dataset(dataset_name, data_dir)
 
         col_df = pd.read_csv(f"{os.path.dirname(__file__)}/col.csv")
-        breakpoint()
         col_list = col_df.loc[col_df["dataset_name"] == dataset_name, "column_name"].tolist()[0].split(', ')
         
         # Within dataset deduplication
         deduplicated_data, _ = deduplicate_within_dataset(ds, col_list, model, threshold)
         
         # load old_embeddings
-        old_answer_embeddings = []
-        old_question_embeddings = []
+        old_embeddings = []
         for file in os.listdir(embeddings_dir):
             if file.endswith(".pkl"):
-                if "answer" in file:
-                    old_answer_embeddings.append(pickle.load(open(os.path.join(embeddings_dir, file), "rb")))
-                else:
-                    old_question_embeddings.append(pickle.load(open(os.path.join(embeddings_dir, file), "rb")))
+                old_embeddings.append(pickle.load(open(os.path.join(embeddings_dir, file), "rb")))
         
         # Between dataset deduplication
-        deduplicated_data, _ = deduplicate_between_datasets(deduplicated_data, col_list, model, old_question_embeddings, old_answer_embeddings, threshold)
+        deduplicated_data, _ = deduplicate_between_datasets(deduplicated_data, col_list, model, old_embeddings, threshold)
         
         # Save deduplicated data
         save_path = os.path.join(save_dir, f"{dataset_name}_deduplicated.csv")
         deduplicated_data.to_csv(save_path, index=False)
 
         # save embeddings
-        calculate_and_save_embeddings(deduplicated_data, dataset_name, model, embeddings_dir)
+        calculate_and_save_embeddings(deduplicated_data, dataset_name, model, col_list, embeddings_dir)
         return True
     except Exception as e:
         print(f"Error processing {dataset_name}: {str(e)}")

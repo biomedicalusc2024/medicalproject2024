@@ -28,9 +28,19 @@ def loadLocalFiles(path):
     sourcePath = os.path.join(path, "text")
     targetPath = os.path.join(path, "labels")
     id_list = os.listdir(sourcePath)
-    source_list = [[os.path.join(sourcePath, s)] for s in id_list]
-    target_list = [[os.path.join(targetPath, s)] for s in id_list]
-    dataset = [{"text_path":text, "label_path":label} for text,label in zip(source_list,target_list)]
+    source_list = [os.path.join(sourcePath, s) for s in id_list]
+    target_list = [os.path.join(targetPath, s) for s in id_list]
+
+    dataset = []
+    for text,label in zip(source_list,target_list):
+        with open(text, "r") as f:
+            text_str = f.read()
+        with open(label, "r") as f:
+            label_str = f.read()
+        dataset.append({
+            "text": text_str,
+            "label": label_str,
+        })
     return dataset
 
 

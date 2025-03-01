@@ -15,6 +15,7 @@ AVAILABLE_DATASETS = [
     "MedicationQA",
     "MedMCQA",
     "MedQA-USMLE",
+    # "MedQuAD",
     "PubMedQA"
 ]
 
@@ -30,13 +31,17 @@ def load_model(model_name):
     
     # maybe add other models here later. Or we provide download links for the models.
     if model_name == "MedImageInsight":
-        if "MedImageInsight" not in os.listdir(""):
-            check_output(["git", "clone", "https://huggingface.co/lion-ai/MedImageInsights"])
-            
-        from MedImageInsights.medimageinsightmodel import MedImageInsight
+        dir_path = os.path.dirname(__file__)
+        if "MedImageInsights" not in os.listdir(dir_path):
+            check_output(["git", "clone", "https://huggingface.co/lion-ai/MedImageInsights", f"{dir_path}/MedImageInsights"])
+
+        import sys
+        sys.path.append(f"{dir_path}/MedImageInsights")
+        from .MedImageInsights.medimageinsightmodel import MedImageInsight
 
         model = MedImageInsight(
             model_dir=f"{os.path.dirname(__file__)}/MedImageInsights/2024.09.27",
+            # model_dir="MedImageInsights/2024.09.27",
             vision_model_name="medimageinsigt-v1.0.0.pt",
             language_model_name="language_model.pth"
         )
@@ -86,7 +91,6 @@ def deduplicate_qa(datasets, data_dir, save_dir, model_name="MedImageInsight", t
     '''
     # Download/verify model
     model = load_model(model_name)
-    # model = None
     
     # Create save directory
     qa_save_dir = os.path.join(save_dir, "deduplicate_qa")
