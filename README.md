@@ -1,34 +1,39 @@
 # Medical Project
 
-dataloader idea:
-load every dataset in following format: self.trainset = [{"img_path": str, "mask_path": str, ...}, ...]
+## dataloader:
+    caption: IUXray, PMC_OA, ROCO
 
-    maybe maintaining a list in README on which datasets are done and if challenged, what is the problem.
+    classification: ChestXRays, CheXpert_small, Cirrhosis, HeartFailurePrediction, HepatitisCPrediction, HoC, IS_A, MedMnist, PTB_XL, ROND, StrokePrediction
 
-    maybe add a file or something to mark everything is downloaded and no need to download again next time used
+    clinical_trail
 
-problems:
-Segmentation/CheXmask: data downloaded only contain mask data, source image need to be downloaded seperately.
-Detection/Breast-Cancer-Screening-DBT: training set over 1TB, test and val over 100GB, hard to implement and test locally.
-MolecularGeneration/CrossDocked2020: Currently use downsampled dataset, full dataset is over 60G which is too big
-VisualGrouping/ChestX_ray8: dataEntity and split file has no direct urls, data resource can be downloaded. Seem same with detaction/ChestXRays.
+    database: CORD19
 
-Summerization/PubMed: Error when loading dataset using datasets from huggingface, not clear how to fix
+    detection: ChestXRays
 
-Segmentation/LIDC-IDRI: requiring downloading NBIA Data Retriever
-segmentation/AbdomenCT-1K: require permission
-segmentation/BKAI_IGH_NeoPolyp: need to submit files to acquire permission
-segmentation/NLST: dataset not public
-segmentation/OCTA500: need account and password
-Classification/MIMIC-CXR: require permission and training
-Classification/Pitt: data missing
-Caption/FFA-IR: require permission
-Caption/MedICaT: need to fill out form to get access
-Caption/PadChest: need requests.
-Detection/Breast-Cancer-Screening-DBT: data missing
-Mask Language/Radiation Oncology Literature: data missing
-others/MIMIC-CXR Radiology Reports: data missing
-QuestionAnswering/RadQA: some dataset need registeration to download.
-QuestionAnswering/CliCR: need to send request email to acquire link for data.
-QuestionAnswering/CT_RATE: need to access token on huggingface.
-QuestionAnswering/QUILT-1M: limited access.
+    inference: BioNLI, ROND
+
+    molecular generation: CrossDocked2020, MOSES
+
+    named entity recognition: DDIEtraction2013, ROND, SourceData
+
+    question answering: LiveQA_TREC_2017, LLaVA_Med, MedicationQA, MedMCQA, MedQA_USMLE, Path_VQA, PMC_VQA, PubMedQA, ROND, VQA_RAD, WSI_VQA
+
+    relation extraction: BC5CDR
+
+    segmentation: ACDC, BraTS, BUID, CBIS_DDSM, ChestXray, CIR, Covid_QU_EX, Hippo, ISIC_2018, ISIC_2019, Kvasir, LA, LiST, MSD, Pancreas, SIIM_ACR_Pneumothorax
+
+    summerization: MeQSum, TREC
+
+    time series: ExtMarker
+
+    virtual screening: ZINC
+
+    visual grouping: ChestX_ray8, SLAKE
+
+## preprocess:
+    deduplication: QA, BioMed
+
+    JERS: Brain
+
+## evaluation:
