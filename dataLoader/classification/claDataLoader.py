@@ -13,6 +13,7 @@ from .StrokePrediction import getStrokePrediction
 from .HepatitisCPrediction import getHepatitisCPrediction
 from .HeartFailurePrediction import getHeartFailurePrediction
 from .NHANES import getNHANES
+from .NHIS import getNHIS
 from .IS_A import getIS_A, IS_A_SUBTITLE
 from .MedMnist import getMedMnist, MedMnist_SUBTITLE
 
@@ -100,6 +101,11 @@ class DataLoader(baseLoader.DataLoader):
             self.support_subset = ["all"]
         elif self.name == "NHANES":
             datasets = getNHANES(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "NHIS":
+            datasets = getNHIS(self.path)
             self.alldata = datasets
             self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
