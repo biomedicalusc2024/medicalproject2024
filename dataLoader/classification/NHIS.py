@@ -1,6 +1,7 @@
 import os
 import warnings
 import pandas as pd
+import zipfile
 
 warnings.filterwarnings("ignore")
 
@@ -61,22 +62,35 @@ def loadLocalFile(file_path):
 
         if ext == ".csv":
             df = pd.read_csv(file_path)
+
         elif ext == ".tsv":
             df = pd.read_csv(file_path, sep="\t")
+
         elif ext in [".dat", ".txt"]:
             print_sys(f"Attempting to load fixed-width file: {file_path}")
             df = pd.read_csv(file_path, sep=",", engine="python", error_bad_lines=False)
+
         elif ext == ".zip":
-            print_sys(f"Zip file detected: {file_path} — please unzip manually if needed.")
-            return None
+            with zipfile.ZipFile(file_path, 'r') as z:
+                zip_members = z.namelist()
+                csv_files = [f for f in zip_members if f.lower().endswith(".csv")]
+                if not csv_files:
+                    raise ValueError(f"No CSV file found in ZIP: {file_path}")
+
+                with z.open(csv_files[0]) as f:
+                    df = pd.read_csv(f)
+                print_sys(f"Loaded {csv_files[0]} from {os.path.basename(file_path)}")
+
         else:
             raise ValueError(f"Unsupported file type: {ext}")
 
         df["__source_file__"] = os.path.basename(file_path)
+
         train_df = df.sample(frac=0.8, random_state=42)
         test_df = df.drop(train_df.index)
 
         return train_df.to_dict(orient="records")
+
     except Exception as e:
         print_sys(f"Error loading file: {e}")
         return None

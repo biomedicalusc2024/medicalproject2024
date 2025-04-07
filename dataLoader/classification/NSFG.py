@@ -1,6 +1,7 @@
 import os
 import warnings
 import pandas as pd
+import zipfile
 
 warnings.filterwarnings("ignore")
 
@@ -57,11 +58,16 @@ def loadLocalFile(file_path):
             df = pd.read_csv(file_path)
         elif ext == ".tsv":
             df = pd.read_csv(file_path, sep="\t")
-        elif ext in [".xpt"]:
+        elif ext == ".xpt":
             df = pd.read_sas(file_path, format="xport", encoding="utf-8")
         elif ext == ".zip":
-            print_sys(f"Zip file detected: {file_path} — please unzip manually if needed.")
-            return None
+            with zipfile.ZipFile(file_path, 'r') as z:
+                zip_members = z.namelist()
+                csv_files = [f for f in zip_members if f.lower().endswith(".csv")]
+                if not csv_files:
+                    raise ValueError(f"No CSV file found in ZIP: {file_path}")
+                with z.open(csv_files[0]) as f:
+                    df = pd.read_csv(f)
         else:
             raise ValueError(f"Unsupported file type: {ext}")
 
