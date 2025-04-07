@@ -1,0 +1,1 @@
+from .interface import get_tabular_patient, get_trial_patient_records
