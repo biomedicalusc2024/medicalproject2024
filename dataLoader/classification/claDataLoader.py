@@ -18,6 +18,7 @@ from .NSFG import getNSFG
 from .NEHRS import getNEHRS
 from .NPALS import getNPALS
 from .NAMCS import getNAMCS
+from .NHAMCS import getNHAMCS
 from .IS_A import getIS_A, IS_A_SUBTITLE
 from .MedMnist import getMedMnist, MedMnist_SUBTITLE
 
@@ -119,6 +120,11 @@ class DataLoader(baseLoader.DataLoader):
             self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
         elif self.name == "NAMCS":
+            datasets = getNHIS(self.path)
+            self.alldata = datasets
+            self.support_format = ["df", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "NHAMCS":
             datasets = getNHIS(self.path)
             self.alldata = datasets
             self.support_format = ["df", "DeepPurpose"]
