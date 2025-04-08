@@ -7,6 +7,16 @@ warnings.filterwarnings("ignore")
 
 from ..utils import print_sys, download_file
 
+try:
+    import pyreadstat  # for .sas7bdat and .sav
+except ImportError:
+    pyreadstat = None
+
+try:
+    import pyreadr  # for .rds
+except ImportError:
+    pyreadr = None
+
 # NPALS dataset info
 NPALS_YEAR = "2022"
 
@@ -31,7 +41,7 @@ NPALS_FILES = {
         "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Provider-SAS-Data-File.sas7bdat",
         "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Provider-SAS-Input-Statements.sas",
         "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Services-User-SAS-Data-File.sas7bdat",
-        "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Services-User-SAS-Input-Statements.sas",
+        "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Services-User-SAS-Input-Statements.sas"
     ],
     "STATA": [
         "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-ADSC-Provider-STATA-Data-File.dta",
@@ -41,7 +51,7 @@ NPALS_FILES = {
         "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Provider-STATA-Data-File.dta",
         "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Provider-STATA-Input-Statements.do",
         "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Services-User-STATA-Data-File.dta",
-        "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Services-User-STATA-Input-Statements.do",
+        "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-RCC-Services-User-STATA-Input-Statements.do"
     ],
     "R": [
         "https://ftp.cdc.gov/pub/health_statistics/nchs/datasets/npals/2022/2022-NPALS-ADSC-Provider-R-Data-File.rds",
@@ -74,19 +84,47 @@ def getNPALS(path):
             else:
                 print_sys(f"Found local file: {file_name}")
 
-            if file_name.endswith(".csv"):
-                _ = loadCSV(file_path)
-            elif file_name.endswith(".zip"):
-                _ = extractZip(file_path, category_path)
-            # PDFs, Excel, STATA, SAS: just download and store
+            _ = loadFile(file_path)
 
-def loadCSV(file_path):
+def loadFile(file_path):
     try:
-        df = pd.read_csv(file_path)
-        df['__source_file__'] = os.path.basename(file_path)
+        ext = os.path.splitext(file_path)[-1].lower()
+
+        if ext == ".csv":
+            df = pd.read_csv(file_path)
+        elif ext == ".tsv":
+            df = pd.read_csv(file_path, sep="\t")
+        elif ext == ".dta":
+            df = pd.read_stata(file_path)
+        elif ext == ".sas7bdat":
+            if pyreadstat:
+                df, _ = pyreadstat.read_sas7bdat(file_path)
+            else:
+                print_sys("pyreadstat not installed. Skipping SAS file.")
+                return None
+        elif ext == ".xpt":
+            df = pd.read_sas(file_path, format="xport")
+        elif ext == ".rds":
+            if pyreadr:
+                result = pyreadr.read_r(file_path)
+                df = next(iter(result.values()))
+            else:
+                print_sys("pyreadr not installed. Skipping RDS file.")
+                return None
+        elif ext in [".txt", ".dat"]:
+            df = pd.read_fwf(file_path)
+        elif ext == ".zip":
+            extractZip(file_path, os.path.dirname(file_path))
+            return None
+        else:
+            return None
+
+        df["__source_file__"] = os.path.basename(file_path)
+        print_sys(f"Loaded: {os.path.basename(file_path)} with {len(df)} rows")
         return df.to_dict(orient="records")
+
     except Exception as e:
-        print_sys(f"Error loading CSV: {e}")
+        print_sys(f"Error loading {file_path}: {e}")
         return None
 
 def extractZip(file_path, extract_to):
