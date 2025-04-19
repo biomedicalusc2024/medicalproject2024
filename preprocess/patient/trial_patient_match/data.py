@@ -1,8 +1,8 @@
 import pdb
 from collections import defaultdict
 
-from trial.bionlp.clinical_trial.pytrial_code.source_code.trial_data import TrialDatasetBase
-from trial.bionlp.patient.patient_data import SequencePatientBase, SeqPatientCollator
+from ...clinical_trial.pytrial_code.trial_data import TrialDatasetBase
+from ..patient_data import SequencePatientBase, SeqPatientCollator
 
 import pandas as pd
 import numpy as np

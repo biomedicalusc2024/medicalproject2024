@@ -1,19 +1,15 @@
 '''
 Basic patient data functions.
 '''
-import warnings
-import pdb
-import json
-import pickle
 import dill
-from collections import defaultdict, OrderedDict
 import torch
-
-from torch.utils.data import Dataset, DataLoader
+import warnings
 import numpy as np
 import pandas as pd
+from torch.utils.data import Dataset
+from collections import defaultdict, OrderedDict
+
 from .tabular_utils import HyperTransformer
-from .tabular_utils import get_transformer
 
 
 

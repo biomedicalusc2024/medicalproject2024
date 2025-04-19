@@ -1,1 +1,1 @@
-from .interface import get_tabular_patient, get_trial_patient_records
+from .demo import patient_prediction, trial_patient_simulation, trial_patient_matching
