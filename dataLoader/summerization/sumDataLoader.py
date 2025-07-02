@@ -4,7 +4,7 @@ warnings.filterwarnings("ignore")
 
 from .. import baseLoader
 from .TREC import getTREC
-from .PubMed import getPubMed
+# from .PubMed import getPubMed
 from .MeQSum import getMeQSum
 
 SUPPORTED_DATASETS = ["PubMed", "MeQSum", "TREC"]
@@ -30,16 +30,16 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if self.name == "PubMed":
-            datasets = getPubMed(self.path)
-            self.alldata = datasets
-            self.support_format = ["df", "DeepPurpose"]
-            self.support_subset = ["all"]
-        elif self.name == "MeQSum":
+        if self.name == "MeQSum":
             datasets = getMeQSum(self.path)
             self.alldata = datasets
             self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
+        # elif self.name == "PubMed":
+        #     datasets = getPubMed(self.path)
+        #     self.alldata = datasets
+        #     self.support_format = ["df", "DeepPurpose"]
+        #     self.support_subset = ["all"]
         elif self.name == "TREC":
             datasets = getTREC(self.path)
             self.alldata = datasets
