@@ -13,7 +13,6 @@ from .StrokePrediction import getStrokePrediction
 from .HepatitisCPrediction import getHepatitisCPrediction
 from .HeartFailurePrediction import getHeartFailurePrediction
 from .NHANES import getNHANES
-from .NHIS import getNHIS
 from .NSFG import getNSFG
 from .NEHRS import getNEHRS
 from .NPALS import getNPALS
@@ -21,11 +20,13 @@ from .NAMCS import getNAMCS
 from .NHAMCS import getNHAMCS
 from .IS_A import getIS_A, IS_A_SUBTITLE
 from .MedMnist import getMedMnist, MedMnist_SUBTITLE
+from .NHIS import getNHIS
+from .MEPS import getMEPS
 
 SUPPORTED_DATASETS = [f"MedMnist-{sub}" for sub in MedMnist_SUBTITLE]
 SUPPORTED_DATASETS += [f"IS_A-{sub}" for sub in IS_A_SUBTITLE]
 SUPPORTED_DATASETS += ["ROND", "ChestXRays", "CheXpert_small", "Cirrhosis", "HeartFailurePrediction", 
-                       "HepatitisCPrediction", "PTB_XL", "HoC", "StrokePrediction"]
+                       "HepatitisCPrediction", "PTB_XL", "HoC", "StrokePrediction", "NHIS", "MEPS"]
 
 class DataLoader(baseLoader.DataLoader):
     """
@@ -36,6 +37,8 @@ class DataLoader(baseLoader.DataLoader):
         self,
         name,
         path="./data",
+        variables=None,
+        task=None,
         print_stats=False,
     ):
         self.name = name
@@ -109,11 +112,6 @@ class DataLoader(baseLoader.DataLoader):
             self.alldata = datasets
             self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["all"]
-        elif self.name == "NHIS":
-            datasets = getNHIS(self.path)
-            self.alldata = datasets
-            self.support_format = ["df", "DeepPurpose"]
-            self.support_subset = ["all"]
         elif self.name == "NSFG":
             datasets = getNHIS(self.path)
             self.alldata = datasets
@@ -146,6 +144,16 @@ class DataLoader(baseLoader.DataLoader):
             self.testset = datasets[1]
             self.support_format = ["df", "DeepPurpose"]
             self.support_subset = ["train", "test", "all"]
+        elif self.name == "NHIS":
+            datasets = getNHIS(self.path, variables, task)
+            self.alldata = datasets
+            self.support_format = ["df", "DeepPurpose"]
+            self.support_subset = ["all"]
+        elif self.name == "MEPS":
+            datasets = getMEPS(self.path, variables, task)
+            self.alldata = datasets
+            self.support_format = ["df", "DeepPurpose"]
+            self.support_subset = ["all"]
         else:
             raise ValueError(f"Dataset {self.name} is not supported. Please select name in {SUPPORTED_DATASETS}.")
 

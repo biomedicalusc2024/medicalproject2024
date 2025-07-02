@@ -1,17 +1,12 @@
-import pandas as pd
-import numpy as np
-import os, sys, json
 import warnings
 
 warnings.filterwarnings("ignore")
 
 from .. import baseLoader
-from .ROND import getROND
-from .BioNLI import getBioNLI
 from .NHIS import getNHIS
 from .MEPS import getMEPS
 
-SUPPORTED_DATASETS = ["ROND", "BioNLI", "NHIS", "MEPS"]
+SUPPORTED_DATASETS = ["NHIS", "MEPS"]
 
 class DataLoader(baseLoader.DataLoader):
     """
@@ -36,19 +31,7 @@ class DataLoader(baseLoader.DataLoader):
         self.support_format = []
         self.support_subset = []
 
-        if self.name == "ROND":
-            datasets = getROND(self.path)
-            self.alldata = datasets
-            self.support_format = ["df", "DeepPurpose"]
-            self.support_subset = ["all"]
-        elif self.name == "BioNLI":
-            datasets = getBioNLI(self.path)
-            self.trainset = datasets[0]
-            self.testset = datasets[1]
-            self.valset = datasets[2]
-            self.support_format = ["df", "DeepPurpose"]
-            self.support_subset = ["train", "test", "validation", "all"]
-        elif self.name == "NHIS":
+        if self.name == "NHIS":
             datasets = getNHIS(self.path, variables, task)
             self.alldata = datasets
             self.support_format = ["df", "DeepPurpose"]

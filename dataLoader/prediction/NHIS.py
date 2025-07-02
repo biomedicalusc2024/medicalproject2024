@@ -8,16 +8,16 @@ warnings.filterwarnings("ignore")
 from ..utils import print_sys
 
 TASKS = {
-    1: "Identify individuals with multiple chronic conditions", 
-    2: "Predict if an individual has any mental health issue",
-    3: "Classify individuals with specific chronic conditions (Diabetes)",
-    4: "Predict high healthcare utilization",
-    5: "Classify individuals based on their combined health and mental well-being",
-    6: "Predict limitation in activities due to any health issue",
-    7: "Identify individuals with a potential anxiety and depression comorbidity",
-    8: "Classify individuals at risk of severe mental distress",
-    9: "Predict flu vaccination uptake",
-    10: "Classify employment status based on health and demographics",
+    1: "Predict the severity of mental health symptoms (Worry/Anxiety)", 
+    2: "Predict the number of chronic conditions",
+    3: "Predict the frequency of joint pain in the past 30 days",
+    4: "Predict an individual's health status",
+    5: "Predict the age of onset of first regular smoking",
+    6: "Predict the impact of mental health on perceived physical health",
+    7: "Predict the number of work loss days based on various factors",
+    8: "Predict fruit consumption levels",
+    9: "Predict the likelihood of delaying medical care due to cost",
+    10: "Predict the age when someone was first diagnosed with a chronic condition (Diabetes)",
 }
 
 
@@ -74,34 +74,6 @@ def calculate_mental_health_score(df):
     df_copy.drop(columns=temp_cols, inplace=True)
     df_copy['MENTAL_HEALTH_SCORE'] = df_copy['MENTAL_HEALTH_SCORE'].astype(int)
     return df_copy['MENTAL_HEALTH_SCORE']
-
-
-def calculate_has_multiple_chronic(df):
-    df_copy = df.copy()
-    chronic_vars = ['ADDEV', 'ANGIPECEV', 'ARTHGLUPEV', 'ASTHMAEV', 'HYP2TIME']
-    temp_cols = []
-    for var in chronic_vars:
-        bin_col_name = f'{var}_bin'
-        temp_cols.append(bin_col_name)
-        df_copy[bin_col_name] = np.where((df_copy[var] == 2) & (~df_copy[var].isin([7, 8, 9])), 1, 0)
-    diabetes_bin_col = 'DIABETES_bin'
-    temp_cols.append(diabetes_bin_col)
-    df_copy[diabetes_bin_col] = np.where((df_copy['DIABETICAGE'] <= 85) & (~df_copy['DIABETICAGE'].between(93, 99)), 1, 0)
-    num_chronic_col = 'NUM_CHRONIC'
-    df_copy[num_chronic_col] = df_copy[temp_cols].sum(axis=1)
-    temp_cols.append(num_chronic_col)
-    df_copy['HAS_MULTIPLE_CHRONIC'] = np.where(df_copy[num_chronic_col] > 1, 1, 0)
-    df_copy.drop(columns=temp_cols, inplace=True)
-    return df_copy['HAS_MULTIPLE_CHRONIC']
-
-
-def calculate_has_mental_health_issue(df):
-    df_copy = df.copy()
-    worried_frequent = df_copy['WORFREQ'].isin([1, 2])
-    depressed_frequent = df_copy['DEPFREQ'].isin([1, 2])
-    df_copy['HAS_MENTAL_HEALTH_ISSUE'] = (worried_frequent | depressed_frequent).astype(int)
-    return df_copy['HAS_MENTAL_HEALTH_ISSUE']
-
 
 
 def getNHIS(path: str, variables: list=None, task: int=None):
@@ -170,8 +142,8 @@ def loadLocalFiles(path, variables=None, task=None):
             df = df[variables]
     else:
         if task == 1:
-            selected_cols = ['HAS_MULTIPLE_CHRONIC', 'AGE', 'SEX', 'RACEA', 'EDUC', 'POORYN', 'SMOKEV', 'ALCSTAT1', 'BMICAT', 'HINOTCOVE']
-            df['HAS_MULTIPLE_CHRONIC'] = calculate_has_multiple_chronic(df)
+            selected_cols = ['WORFEELEVL', 'AGE', 'SEX', 'EDUC', 'NUM_CHRONIC', 'WORFREQ', 'WORRX']
+            df['NUM_CHRONIC'] = calculate_num_chronic(df)
             df = df[selected_cols]
 
             df = df[df["AGE"]>=18]
@@ -179,8 +151,16 @@ def loadLocalFiles(path, variables=None, task=None):
             df = df.reset_index(drop=True)
             
         elif task == 2:
-            selected_cols = ['HAS_MENTAL_HEALTH_ISSUE', 'AGE', 'SEX', 'EDUC', 'MARSTCUR', 'HEALTH', 'NUM_CHRONIC', 'ANXIETYEV', 'DEPRX']
-            df['HAS_MENTAL_HEALTH_ISSUE'] = calculate_has_mental_health_issue(df)
+            selected_cols = ['NUM_CHRONIC', 'AGE', 'SEX', 'RACEA', 'EDUC', 'FAMTOTINC', 'SMOKEV', 'BMICAT', 'HEALTH']
+            df['NUM_CHRONIC'] = calculate_num_chronic(df)
+            df = df[selected_cols]
+
+            df = df[df["AGE"]>=18]
+            df = df.dropna(subset=['AGE', 'SEX', 'RACEA', 'EDUC', 'SMOKEV', 'BMICAT', 'HEALTH'])
+            df = df.reset_index(drop=True)
+
+        elif task == 3:
+            selected_cols = ['JNTMO', 'AGE', 'SEX', 'BMICAT', 'NUM_CHRONIC', 'ARTHGLUPEV']
             df['NUM_CHRONIC'] = calculate_num_chronic(df)
             df = df[selected_cols]
 
@@ -188,18 +168,9 @@ def loadLocalFiles(path, variables=None, task=None):
             df = df.dropna(subset=selected_cols)
             df = df.reset_index(drop=True)
 
-        elif task == 3:
-            selected_cols = ['DIABETES', 'DIABETICAGE', 'AGE', 'SEX', 'BMICAT', 'HYP2TIME', 'ARTHGLUPEV', 'SMOKEV']
-            df['DIABETES'] = df['DIABETICAGE'].apply(lambda x: int(x<93))
-            df = df[selected_cols]
-
-            df = df[df["AGE"]>=18]
-            df = df.dropna(subset=selected_cols)
-            df = df.reset_index(drop=True)
-
         elif task == 4:
-            selected_cols = ['HIGH_UTILIZATION', 'BEDAYR2', 'AGE', 'SEX', 'NUM_CHRONIC', 'HEALTH', 'HINOTCOVE']
-            df['HIGH_UTILIZATION'] = df['BEDAYR2'].isin([3, 4, 5])
+            selected_cols = ['HEALTH', 'AGE', 'SEX', 'BMICAT', 'SMOKEV', 'ALCSTAT1', 'NUM_CHRONIC', 'MENTAL_HEALTH_SCORE']
+            df['MENTAL_HEALTH_SCORE'] = calculate_mental_health_score(df)
             df['NUM_CHRONIC'] = calculate_num_chronic(df)
             df = df[selected_cols]
             
@@ -208,18 +179,17 @@ def loadLocalFiles(path, variables=None, task=None):
             df = df.reset_index(drop=True)
 
         elif task == 5:
-            selected_cols = ['HEALTH', 'WORFREQ', 'DEPFREQ', 'AGE', 'SEX', 'EDUC', 'BMICAT', 'SMOKEV']
+            selected_cols = ['SMOKAGEREG', 'AGE', 'EDUC', 'POORYN', 'ALCSTAT1']
             df = df[selected_cols]
             
-            df = df[df["AGE"]>=18]
+            df = df[df["SMOKAGEREG"]<96]
             df = df.dropna(subset=selected_cols)
             df = df.reset_index(drop=True)
 
         elif task == 6:
-            selected_cols = ['LANY_LIMITED', 'LANY', 'AGE', 'NUM_CHRONIC', 'MENTAL_HEALTH_SCORE', 'ARTHLIMIT', 'HEALTH']
+            selected_cols = ['HEALTH', 'MENTAL_HEALTH_SCORE', 'AGE', 'SEX', 'NUM_CHRONIC', 'HINOTCOVE']
             df['MENTAL_HEALTH_SCORE'] = calculate_mental_health_score(df)
             df['NUM_CHRONIC'] = calculate_num_chronic(df)
-            df['LANY_LIMITED'] = df['LANY'].apply(lambda x: int(x==10))
             df = df[selected_cols]
             
             df = df[df["AGE"]>=18]
@@ -227,8 +197,9 @@ def loadLocalFiles(path, variables=None, task=None):
             df = df.reset_index(drop=True)
 
         elif task == 7:
-            selected_cols = ['COMORBIDITY', 'ANXIETYEV', 'DEPFREQ', 'AGE', 'SEX', 'WORRX', 'DEPRX']
-            df['COMORBIDITY'] = df.apply(lambda row: int((row['ANXIETYEV']==2) and (row['DEPFREQ'] in [1, 2])), axis=1)
+            selected_cols = ['WLDAYR', 'AGE', 'HEALTH', 'NUM_CHRONIC', 'MENTAL_HEALTH_SCORE']
+            df['MENTAL_HEALTH_SCORE'] = calculate_mental_health_score(df)
+            df['NUM_CHRONIC'] = calculate_num_chronic(df)
             df = df[selected_cols]
 
             df = df[df["AGE"]>=18]
@@ -236,32 +207,26 @@ def loadLocalFiles(path, variables=None, task=None):
             df = df.reset_index(drop=True)
 
         elif task == 8:
-            selected_cols = ['HIGH_DISTRESS', 'WORFEELEVL', 'DEPFEELEVL', 'AGE', 'SEX', 'EDUC', 'FAMTOTINC']
-            df['HIGH_DISTRESS'] = df.apply(lambda row: int((row['WORFEELEVL']==1) or (row['DEPFEELEVL']==1)), axis=1)
+            selected_cols = ['FRUTNO', 'AGE', 'SEX', 'EDUC', 'FAMTOTINC']
             df = df[selected_cols]
 
             df = df[df["AGE"]>=18]
-            df = df.dropna(subset=selected_cols)
+            df = df.dropna(subset=['FRUTNO', 'AGE', 'SEX', 'EDUC'])
             df = df.reset_index(drop=True)
 
         elif task == 9:
-            selected_cols = ['VACCINATED', 'VACFLU12M', 'AGE', 'SEX', 'NUM_CHRONIC', 'HINOTCOVE', 'EDUC', 'HEALTH']
-            df['VACCINATED'] = df['VACFLU12M'].apply(lambda x: int(x in [2,3]))
-            df['NUM_CHRONIC'] = calculate_num_chronic(df)
+            selected_cols = ['DELAYCOST', 'HINOTCOVE', 'FAMTOTINC']
+            df = df[df["AGE"]>=18]
             df = df[selected_cols]
 
-            df = df[df["AGE"]>=18]
             df = df.dropna(subset=selected_cols)
             df = df.reset_index(drop=True)
 
         elif task == 10:
-            selected_cols = ['EMPLOYED', 'EMPSTAT', 'AGE', 'SEX', 'EDUC', 'HEALTH', 'NUM_CHRONIC', 'MENTAL_HEALTH_SCORE']
-            df['MENTAL_HEALTH_SCORE'] = calculate_mental_health_score(df)
-            df['NUM_CHRONIC'] = calculate_num_chronic(df)
-            df['EMPLOYED'] = df['EMPSTAT'].apply(lambda x: int(x>=100 and x<=122))
+            selected_cols = ['DIABETICAGE', 'AGE', 'BMICAT', 'FAMTOTINC']
             df = df[selected_cols]
 
-            df = df[(df['AGE']>=18)&(df['AGE']<=64)]
+            df = df[df['DIABETICAGE']<93]
             df = df.dropna(subset=selected_cols)
             df = df.reset_index(drop=True)
 
