@@ -40,6 +40,8 @@
 
     patient data
 
+    3D Image & quality control
+
 ## evaluation:
     dice_coef
 
