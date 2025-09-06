@@ -31,6 +31,8 @@ SUPPORTED_DATASETS += ["ROND", "ChestXRays", "CheXpert_small", "Cirrhosis", "Hea
 class DataLoader(baseLoader.DataLoader):
     """
     refer to baseLoader
+    variables: list of variable names for NHIS and MEPS datasets
+    task: int, index of target variable for NHIS and MEPS datasets
     """
 
     def __init__(

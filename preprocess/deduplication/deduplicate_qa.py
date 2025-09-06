@@ -49,12 +49,14 @@ def load_model(model_name):
         return model
 
 
-def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, threshold):
+def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, threshold, test):
     """Process a single dataset through deduplication pipeline"""
     
     try:
         # Load dataset
         ds = load_dataset(dataset_name, data_dir)
+        if test:
+            ds = ds.sample(min(320, len(ds)), random_state=42).reset_index(drop=True)
         
         # Within dataset deduplication
         deduplicated_data, _, _ = deduplication_within_dataset_qa(ds, model, threshold)
@@ -85,7 +87,7 @@ def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, thr
     
     
 
-def deduplicate_qa(datasets, data_dir, save_dir, model_name="MedImageInsight", threshold=0.9):
+def deduplicate_qa(datasets, data_dir, save_dir, test=False, model_name="MedImageInsight", threshold=0.9):
     '''
     datasets(List(Str)): which datasets to load
     '''
@@ -118,13 +120,14 @@ def deduplicate_qa(datasets, data_dir, save_dir, model_name="MedImageInsight", t
                 qa_save_dir,
                 embeddings_dir,
                 model,
-                threshold
+                threshold,
+                test
             )
-            if result:
+            if result is None:
+                print(f"Failed to process {dataset}")
+            else:
                 print(f"Successfully processed {dataset}")
                 deduplicate_results[dataset] = result
-            else:
-                print(f"Failed to process {dataset}")
         except Exception as e:
             print(f"Error processing {dataset}: {str(e)}")
             continue

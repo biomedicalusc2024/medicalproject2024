@@ -21,7 +21,10 @@ def datasetLoad(urls, path, datasetName):
             return loadLocalFiles(datasetPath)
         else:
             os.makedirs(datasetPath, exist_ok=True)
-            download_file(urls[0], zipPath, datasetPath)
+            try:
+                download_file(urls[0], zipPath, datasetPath)
+            except Exception as e:
+                print_sys(f"error: {e}")
             return loadLocalFiles(datasetPath)
         
     except Exception as e:

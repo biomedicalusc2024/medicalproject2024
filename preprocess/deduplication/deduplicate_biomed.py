@@ -53,12 +53,14 @@ def load_model(model_name):
 
     
 
-def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, threshold):
+def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, threshold, test):
     """Process a single dataset through deduplication pipeline"""
     
     try:
         # Load dataset
         ds = load_dataset(dataset_name, data_dir)
+        if test:
+            ds = ds.sample(min(320, len(ds)), random_state=42).reset_index(drop=True)
 
         col_df = pd.read_csv(f"{os.path.dirname(__file__)}/col.csv")
         col_list = col_df.loc[col_df["dataset_name"] == dataset_name, "column_name"].tolist()[0].split(', ')
@@ -88,7 +90,7 @@ def process_dataset(dataset_name, data_dir, save_dir, embeddings_dir, model, thr
     
     
 
-def deduplicate_biomed(datasets, data_dir, save_dir, model_name="MedImageInsight", threshold=0.9):
+def deduplicate_biomed(datasets, data_dir, save_dir, test=False, model_name="MedImageInsight", threshold=0.9):
     '''
     datasets(List(Str)): which datasets to load
     '''
@@ -121,13 +123,14 @@ def deduplicate_biomed(datasets, data_dir, save_dir, model_name="MedImageInsight
                 qa_save_dir,
                 embeddings_dir,
                 model,
-                threshold
+                threshold,
+                test
             )
-            if result:
+            if result is None:
+                print(f"Failed to process {dataset}")
+            else:
                 print(f"Successfully processed {dataset}")
                 deduplicate_results[dataset] = result
-            else:
-                print(f"Failed to process {dataset}")
         except Exception as e:
             print(f"Error processing {dataset}: {str(e)}")
             continue

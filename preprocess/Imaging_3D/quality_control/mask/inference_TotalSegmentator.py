@@ -9,9 +9,9 @@ import torch
 import matplotlib.pyplot as plt
 import torchvision.transforms as transforms
 import pandas as pd
-from model import QualitySentinel
+from .model import QualitySentinel
 
-from dataset import Clip_Rescale, crop_slices
+from .dataset import Clip_Rescale, crop_slices
 
 class_map = {  # from totalsegmentator => DAP Atlas embedding
  'adrenal_gland_left': 27,
@@ -119,7 +119,8 @@ class_map = {  # from totalsegmentator => DAP Atlas embedding
  'vertebrae_T11': 60,
  'vertebrae_T12': 61}
 
-with open('label_embedding.pkl', 'rb') as file:
+embedding_path = os.path.join(os.path.dirname(__file__), 'label_embedding.pkl')
+with open(embedding_path, 'rb') as file:
     embedding_dict = pickle.load(file)
 
 def load_nii(path):
