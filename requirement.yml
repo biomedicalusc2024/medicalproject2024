@@ -8,20 +8,26 @@ dependencies:
   - _libgcc_mutex=0.1=main
   - _openmp_mutex=5.1=1_gnu
   - _sysroot_linux-64_curr_repodata_hack=3=haa98f57_10
+  - aiodns=3.5.0=py310h06a4308_0
+  - aiohappyeyeballs=2.6.1=py310h06a4308_0
+  - async-timeout=5.0.1=py310h06a4308_0
   - binutils_impl_linux-64=2.40=h5293946_0
   - binutils_linux-64=2.40.0=hc2dff05_2
   - blas=1.0=mkl
   - bottleneck=1.4.2=py310ha9d4c09_0
   - brotli-python=1.1.0=py310hf71b8c6_2
   - bzip2=1.0.8=h5eee18b_6
-  - ca-certificates=2025.2.25=h06a4308_0
+  - c-ares=1.34.5=hef5626c_0
+  - ca-certificates=2025.7.15=h06a4308_0
   - cffi=1.17.1=py310h8deb56e_0
   - charset-normalizer=3.4.1=pyhd8ed1ab_0
   - click=8.1.7=py310h06a4308_0
   - cudatoolkit=11.6.2=hfc3e2af_13
   - dataclasses=0.8=pyh6d0b6a4_7
+  - expat=2.7.1=h6a678d5_0
   - ffmpeg=4.3=hf484d3e_0
   - freetype=2.10.4=h0708190_1
+  - frozenlist=1.5.0=py310h5eee18b_0
   - fsspec=2024.12.0=py310h06a4308_0
   - gcc_impl_linux-64=11.2.0=h1234567_1
   - gcc_linux-64=11.2.0=h5c386dc_2
@@ -63,6 +69,7 @@ dependencies:
   - libstdcxx-ng=14.2.0=h4852527_2
   - libtiff=4.5.1=hffd6297_1
   - libuuid=1.41.5=h5eee18b_0
+  - libuv=1.48.0=h5eee18b_0
   - libwebp-base=1.5.0=h851e524_0
   - libxml2=2.13.5=hfdd30dd_0
   - lz4-c=1.9.4=hcb278e6_0
@@ -70,6 +77,7 @@ dependencies:
   - mkl-service=2.4.0=py310h5eee18b_2
   - mkl_fft=1.3.11=py310h5eee18b_0
   - mkl_random=1.2.8=py310h1128e8f_0
+  - multidict=6.1.0=py310h5eee18b_0
   - ncurses=6.4=h6a678d5_0
   - nettle=3.6=he412f7d_0
   - numexpr=2.10.1=py310h3c60e43_0
@@ -77,15 +85,16 @@ dependencies:
   - numpy-base=1.26.4=py310hb5e798b_0
   - openh264=2.1.1=h780b84a_0
   - openjpeg=2.5.2=he7f1fd0_0
-  - openssl=1.1.1w=h7f8727e_0
+  - openssl=3.0.17=h5eee18b_0
   - packaging=24.2=py310h06a4308_0
   - pandas=2.2.3=py310h6a678d5_0
   - pillow=11.1.0=py310hcea889d_0
   - pip=24.2=py310h06a4308_0
   - protobuf=4.25.3=py310he36ed58_1
+  - pycares=4.10.0=py310ha137689_0
   - pycparser=2.22=pyh29332c3_1
   - pysocks=1.7.1=pyha55dd90_7
-  - python=3.10.13=h7a1cb2a_0
+  - python=3.10.18=h1a3bd86_0
   - python-dateutil=2.9.0post0=py310h06a4308_2
   - python-tzdata=2023.3=pyhd3eb1b0_0
   - python_abi=3.10=2_cp310
@@ -108,17 +117,16 @@ dependencies:
   - typing-extensions=4.12.2=hd8ed1ab_1
   - typing_extensions=4.12.2=pyha770c72_1
   - urllib3=2.3.0=pyhd8ed1ab_0
+  - uvloop=0.21.0=py310h5eee18b_0
   - wheel=0.44.0=py310h06a4308_0
-  - xz=5.4.6=h5eee18b_1
+  - xz=5.6.4=h5eee18b_1
   - yaml=0.2.5=h7b6447c_0
   - zlib=1.2.13=h5eee18b_1
   - zstandard=0.23.0=py310ha75aee5_1
   - zstd=1.5.6=hc292b87_0
   - pip:
-      - aiohappyeyeballs==2.6.1
       - aiohttp==3.11.11
       - aiosignal==1.3.2
-      - async-timeout==5.0.1
       - attrs==25.3.0
       - beautifulsoup4==4.13.4
       - bioc==2.1
@@ -136,7 +144,6 @@ dependencies:
       - faker==37.1.0
       - filelock==3.16.1
       - fonttools==4.55.3
-      - frozenlist==1.5.0
       - fvcore==0.1.5.post20221221
       - gdown==5.2.0
       - huggingface-hub==0.27.0
@@ -153,7 +160,6 @@ dependencies:
       - markdown-it-py==3.0.0
       - matplotlib==3.10.0
       - mdurl==0.1.2
-      - multidict==6.1.0
       - multiprocess==0.70.16
       - mup==1.0.0
       - narwhals==1.35.0
