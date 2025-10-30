@@ -96,7 +96,7 @@ def default_lits():
     print(f"Average predicted Dice: {np.mean(pred_dices):.4f}")
     print("\nDetailed Results:")
     for name, dice in zip(mask_names, pred_dices):
-        print(f"{os.path.basename(name)}: {dice:.4f}")
+        print(f"Dice for {os.path.basename(name)}: {dice:.4f}")
 
 if __name__ == "__main__":
     default_lits()

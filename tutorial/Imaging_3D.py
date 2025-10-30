@@ -146,7 +146,6 @@ def run_lits_test(test_mode: bool = True) -> bool:
     
     Args:
         test_mode: Whether to run in test mode
-        output_dir: Output directory for results
         
     Returns:
         bool: True if test completed successfully
@@ -157,46 +156,90 @@ def run_lits_test(test_mode: bool = True) -> bool:
         print("(RUNNING IN TEST MODE)")
     print("=" * 60)
     
+    # Print detailed explanation of what this test does
+    print("\n TEST OVERVIEW:")
+    print("This test evaluates a quality control model for liver segmentation masks.")
+    print("The model predicts Dice coefficients to assess segmentation quality.")
+    print("\n WHAT IS DICE COEFFICIENT?")
+    print("- Dice coefficient measures overlap between predicted and ground truth masks")
+    print("- Range: 0.0 (no overlap) to 1.0 (perfect overlap)")
+    print("- Values > 0.7 typically indicate good segmentation quality")
+    print("- Values < 0.5 may indicate poor segmentation quality")
+    
     try:
         from medicalproject2024.preprocess.Imaging_3D.quality_control.mask.test_lits import default_lits
-        print("Successfully imported LiTS test module")
-        
+        print("\n Successfully imported LiTS test module")
         
         # Run the test
-        print("\nRunning LiTS test...")
+        print("\n Running LiTS test...")
         print("-" * 30)
         
         try:
             default_lits()
             print("-" * 30)
-            print("LiTS test completed successfully")
+            
+            # Enhanced results explanation
+            print("\n UNDERSTANDING THE RESULTS:")
+            print("=" * 40)
+            print("• 'Average predicted Dice': Mean quality score across all test samples")
+            print("• 'Detailed Results': Individual quality predictions for each CT slice")
+            print("\n INTERPRETATION GUIDE:")
+            print("• Dice > 0.8: Excellent segmentation quality")
+            print("• Dice 0.6-0.8: Good segmentation quality") 
+            print("• Dice 0.4-0.6: Moderate segmentation quality")
+            print("• Dice < 0.4: Poor segmentation quality")
+            print("\n TECHNICAL DETAILS:")
+            print("• Model: Pre-trained neural network for quality assessment")
+            print("• Input: CT images and corresponding segmentation masks")
+            print("• Output: Predicted Dice coefficient for each mask")
+            print("• Dataset: LiTS (Liver Tumor Segmentation Challenge)")
+            
+            print("\n LiTS test completed successfully")
             return True
             
         except Exception as e:
             print("-" * 30)
-            print(f"LiTS test failed: {e}")
+            print(f" LiTS test failed: {e}")
             
-            # Provide specific guidance based on error type
+            # Enhanced error handling with more specific guidance
+            print("\n TROUBLESHOOTING GUIDE:")
             if "Bad CRC-32" in str(e) or "corrupted" in str(e).lower():
-                print("\nCorrupted download detected. Suggested fixes:")
-                print("   1. Clear download cache and retry")
-                print("   2. Check available disk space")
-                print("   3. Try downloading with stable internet connection")
+                print(" CORRUPTED DOWNLOAD DETECTED:")
+                print("   • Clear download cache: rm -rf ./data/LiTS")
+                print("   • Check available disk space (need ~100MB)")
+                print("   • Ensure stable internet connection for download")
+                print("   • Try running the test again")
             elif "No module named" in str(e):
-                print("\nMissing dependency detected. Suggested fixes:")
-                print("   1. Install missing packages: pip install torch torchvision gdown tqdm")
-                print("   2. Check if all required files are present")
+                print(" MISSING DEPENDENCY DETECTED:")
+                print("   • Install required packages:")
+                print("     pip install torch torchvision gdown tqdm matplotlib")
+                print("   • Verify all Imaging_3D modules are present")
+                print("   • Check Python path configuration")
             elif "CUDA" in str(e) or "device" in str(e).lower():
-                print("\nGPU/Device issue detected. Suggested fixes:")
-                print("   1. Ensure PyTorch is properly installed")
-                print("   2. Check if CUDA is available (if using GPU)")
-                print("   3. Try running on CPU instead")
+                print("  GPU/DEVICE ISSUE DETECTED:")
+                print("   • Check PyTorch installation: python -c 'import torch; print(torch.__version__)'")
+                print("   • Verify CUDA availability: python -c 'import torch; print(torch.cuda.is_available())'")
+                print("   • Consider running on CPU if GPU issues persist")
+            elif "download" in str(e).lower() or "url" in str(e).lower():
+                print(" DOWNLOAD ISSUE DETECTED:")
+                print("   • Check internet connection")
+                print("   • Verify Google Drive access (dataset hosted there)")
+                print("   • Try again later if server is temporarily unavailable")
+            else:
+                print(" GENERAL ERROR:")
+                print(f"   • Error details: {str(e)}")
+                print("   • Check log files for more information")
+                print("   • Ensure all dependencies are properly installed")
             
             return False
         
     except ImportError as e:
-        print(f"Failed to import LiTS test module: {e}")
-        print("Please ensure all Imaging_3D modules are properly installed")
+        print(f" Failed to import LiTS test module: {e}")
+        print("\n MODULE IMPORT TROUBLESHOOTING:")
+        print("• Ensure medicalproject2024 package is properly installed")
+        print("• Check if all Imaging_3D modules are in correct directory")
+        print("• Verify Python path includes project root")
+        print("• Try reinstalling the package dependencies")
         return False
 
 
@@ -227,7 +270,7 @@ Examples:
     # Setup environment
     project_root = setup_environment()
     
-    print("\n🏥 3D Medical Imaging Processing Tutorial")
+    print("\n 3D Medical Imaging Processing Tutorial")
     print("=" * 60)
     
     # Check dependencies
