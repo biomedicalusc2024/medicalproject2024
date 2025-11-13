@@ -1,0 +1,3 @@
+[submodule "benchmark/benchmark/U-Bench"]
+	path = benchmark/benchmark/U-Bench
+	url = https://github.com/FengheTan9/U-Bench
