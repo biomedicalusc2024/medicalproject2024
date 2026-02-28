@@ -4,3 +4,6 @@
 [submodule "benchmark/U-Bench"]
 	path = benchmark/U-Bench
 	url = https://github.com/FengheTan9/U-Bench
+[submodule "benchmark/MedEvalKit"]
+	path = benchmark/MedEvalKit
+	url = https://github.com/alibaba-damo-academy/MedEvalKit.git
